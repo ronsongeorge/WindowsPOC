@@ -15,3 +15,15 @@ D:\Ronson\WindowsPOC\EntitiesLib\bin\Debug\NPOI.OpenXmlFormats.dll
 D:\Ronson\WindowsPOC\EntitiesLib\bin\Debug\NPOI.xml
 D:\Ronson\WindowsPOC\EntitiesLib\obj\Debug\EntitiesLib.dll
 D:\Ronson\WindowsPOC\EntitiesLib\obj\Debug\EntitiesLib.pdb
+C:\Users\User1\Documents\GitHub\WindowsPOC\EntitiesLib\obj\Debug\EntitiesLib.csprojResolveAssemblyReference.cache
+C:\Users\User1\Documents\GitHub\WindowsPOC\EntitiesLib\obj\Debug\EntitiesLib.dll
+C:\Users\User1\Documents\GitHub\WindowsPOC\EntitiesLib\bin\Debug\Configuration.xml
+C:\Users\User1\Documents\GitHub\WindowsPOC\EntitiesLib\bin\Debug\EntitiesLib.dll
+C:\Users\User1\Documents\GitHub\WindowsPOC\EntitiesLib\bin\Debug\EntitiesLib.pdb
+C:\Users\User1\Documents\GitHub\WindowsPOC\EntitiesLib\bin\Debug\ICSharpCode.SharpZipLib.dll
+C:\Users\User1\Documents\GitHub\WindowsPOC\EntitiesLib\bin\Debug\NPOI.dll
+C:\Users\User1\Documents\GitHub\WindowsPOC\EntitiesLib\bin\Debug\NPOI.OOXML.dll
+C:\Users\User1\Documents\GitHub\WindowsPOC\EntitiesLib\bin\Debug\NPOI.OpenXml4Net.dll
+C:\Users\User1\Documents\GitHub\WindowsPOC\EntitiesLib\bin\Debug\NPOI.OpenXmlFormats.dll
+C:\Users\User1\Documents\GitHub\WindowsPOC\EntitiesLib\bin\Debug\NPOI.xml
+C:\Users\User1\Documents\GitHub\WindowsPOC\EntitiesLib\obj\Debug\EntitiesLib.pdb

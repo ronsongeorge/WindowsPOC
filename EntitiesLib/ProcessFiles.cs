@@ -35,17 +35,29 @@ namespace EntitiesLib
             ISheet sheet = workbook.GetSheetAt(0); // zero-based index of your target sheet
             EmployeeDetails emp = null;
             int rowIndex = 0;
+
+            #region ColumnIndex variables
+            int CostStartIndex = int.Parse(columns.Attribute("CostStartIndex").Value);
+            int EmployeeID = ColNmToNum(columns.Element("EmployeeID").Value);
+            int EmloyeeFirstName = ColNmToNum(columns.Element("EmloyeeFirstName").Value);
+            int EmployeeLastName = ColNmToNum(columns.Element("EmployeeLastName").Value);
+            int Location = ColNmToNum(columns.Element("Location").Value);
+            int GroupName = ColNmToNum(columns.Element("GroupName").Value);
+            int ManagerName = ColNmToNum(columns.Element("ManagerName").Value);
+            int Salary = ColNmToNum(columns.Element("Salary").Value);
+            #endregion
+
             foreach (IRow row in sheet)
             {
                 // skip header row
-                if (rowIndex++ == 0) continue;
+                if (rowIndex++ == CostStartIndex - 1) continue;
                 try
                 {
                     emp = new EmployeeDetails();
 
                     try
                     {
-                        emp.EmployeeID = Convert.ToInt16(row.Cells[int.Parse(columns.Element("EmployeeID").Value) - 1].ToString());
+                        emp.EmployeeID = Convert.ToInt16(row.Cells[EmployeeID - 1].ToString());
                     }
                     catch
                     {
@@ -53,12 +65,12 @@ namespace EntitiesLib
                         continue;
                     }
 
-                    emp.EmployeeName = string.Format("{0} {1}", row.Cells[int.Parse(columns.Element("EmloyeeFirstName").Value) - 1].ToString(),
-                        row.Cells[int.Parse(columns.Element("EmployeeLastName").Value) - 1].ToString());
-                    emp.IsOnsite = row.Cells[int.Parse(columns.Element("Location").Value) - 1].ToString().ToLower().Equals("india") ? false : true;
-                    emp.VerticalName = row.Cells[int.Parse(columns.Element("GroupName").Value) - 1].ToString();
-                    emp.ManagerName = row.Cells[int.Parse(columns.Element("ManagerName").Value) - 1].ToString();
-                    emp.Salary = Decimal.Parse(row.Cells[int.Parse(columns.Element("CTC").Value) - 1].ToString().Replace("$", "").Replace(",", "")) / 12;
+                    emp.EmployeeName = string.Format("{0} {1}", row.Cells[EmloyeeFirstName - 1].ToString(),
+                        row.Cells[EmployeeLastName - 1].ToString());
+                    emp.IsOnsite = row.Cells[Location - 1].ToString().ToLower().Equals("india") ? false : true;
+                    emp.VerticalName = row.Cells[GroupName - 1].ToString();
+                    emp.ManagerName = row.Cells[ManagerName - 1].ToString();
+                    emp.Salary = Decimal.Parse(row.Cells[Salary - 1].ToString().Replace("$", "").Replace(",", "")) / 12;
 
                     emp.AccountID = 0;
                     if (emp.VerticalName.ToLower().Equals("pmo") || emp.VerticalName.ToLower().Equals("account management"))
@@ -98,18 +110,23 @@ namespace EntitiesLib
             }
             ISheet sheet = workbook.GetSheetAt(0); // zero-based index of your target sheet
 
-            #region Initialize private variable
             int rowIndex = 0;
             decimal value = 0;
             int id = 0;
             bool IsTotalCostCol = false;
             decimal tempRevenue;
             string identifier = string.Empty;
-            int identifierColumn = int.Parse(columns.Element("ChangeInRevenue").Value) - 1;
+
+            #region ColumnIndex variables
+            int BillingStartIndex = int.Parse(columns.Attribute("BillingStartIndex").Value);
+            int identifierColumn = ColNmToNum(columns.Element("ChangeInRevenue").Value);
             string identifierTxt = columns.Element("ChangeInRevenue").Attribute("identifier").Value;
             string parseTillSectionTxt = columns.Element("ChangeInRevenue").Attribute("ParseTillSection").Value;
-            int empIdColumn = int.Parse(columns.Element("EmployeeID").Value) - 1;
-            int amountColumn = int.Parse(columns.Element("Amount").Value) - 1;
+            int empIdColumn = ColNmToNum(columns.Element("EmployeeID").Value);
+            int amountColumn = ColNmToNum(columns.Element("Amount").Value);
+            int TotalCost = ColNmToNum(columns.Element("TotalCost").Value);
+            int SeatAllcationOffShore = int.Parse(columns.Attribute("SeatAllcationOffShore").Value);
+            decimal SeatAllcationOnShorePercnt = decimal.Parse(columns.Attribute("SeatAllcationOnShorePercnt").Value);
             # endregion
 
             foreach (IRow row in sheet)
@@ -117,10 +134,10 @@ namespace EntitiesLib
                 value = 0;
                 tempRevenue = 0;
                 // skip header row
-                if (rowIndex++ < 2) continue;
+                if (rowIndex++ < BillingStartIndex - 1) continue;
                 try
                 {
-                    identifier = row.Cells[identifierColumn].ToString();
+                    identifier = row.Cells[identifierColumn - 1].ToString();
 
                     // for now do not calculate row below subtotal i.e. other expenses.
                     if (identifier.ToLower().Contains(parseTillSectionTxt.ToLower()))
@@ -129,14 +146,14 @@ namespace EntitiesLib
                     if (!IsTotalCostCol && identifier.ToLower().Contains(identifierTxt.ToLower()))
                         IsTotalCostCol = true;
 
-                    id = Convert.ToInt16(row.Cells[empIdColumn].ToString());
+                    id = Convert.ToInt16(row.Cells[empIdColumn - 1].ToString());
 
                     if (EmployeeObject.Any(e => e.EmployeeID == id))
                     {
 
                         if (!IsTotalCostCol)
                         {
-                            if (decimal.TryParse(row.Cells[amountColumn].NumericCellValue.ToString(), out value) && value != 0)
+                            if (decimal.TryParse(row.Cells[amountColumn - 1].NumericCellValue.ToString(), out value) && value != 0)
                             {
                                 EmployeeObject.Where(e => e.EmployeeID == id).FirstOrDefault().Revenue = value;
                                 EmployeeObject.Where(e => e.EmployeeID == id).FirstOrDefault().IsBillable = true;
@@ -148,17 +165,17 @@ namespace EntitiesLib
 
                             if (EmployeeObject.Where(e => e.EmployeeID == id).FirstOrDefault().IsOnsite == false)
                             {
-                                EmployeeObject.Where(e => e.EmployeeID == id).FirstOrDefault().Revenue += int.Parse(columns.Attribute("SeatAllcationOffShore").Value);
+                                EmployeeObject.Where(e => e.EmployeeID == id).FirstOrDefault().Revenue += SeatAllcationOffShore;
                             }
                             else
                             {
-                                EmployeeObject.Where(e => e.EmployeeID == id).FirstOrDefault().Revenue += EmployeeObject.Where(e => e.EmployeeID == id).FirstOrDefault().Salary * decimal.Parse(columns.Attribute("SeatAllcationOnShorePercnt").Value);
+                                EmployeeObject.Where(e => e.EmployeeID == id).FirstOrDefault().Revenue += EmployeeObject.Where(e => e.EmployeeID == id).FirstOrDefault().Salary * (SeatAllcationOnShorePercnt);
                             }
 
                         }
                         else
                         {
-                            if (decimal.TryParse(row.Cells[int.Parse(columns.Element("TotalCost").Value) - 1].NumericCellValue.ToString(), out value) && value != 0)
+                            if (decimal.TryParse(row.Cells[TotalCost - 1].NumericCellValue.ToString(), out value) && value != 0)
                             {
                                 tempRevenue = EmployeeObject.Where(e => e.EmployeeID == id).FirstOrDefault().Revenue;
                                 EmployeeObject.Where(e => e.EmployeeID == id).FirstOrDefault().Revenue = tempRevenue + value;
@@ -184,6 +201,23 @@ namespace EntitiesLib
             isSucess = true;
 
             return isSucess;
+        }
+
+        public static int ColNmToNum(string columnName)
+        {
+            if (string.IsNullOrEmpty(columnName)) throw new ArgumentNullException("columnName");
+
+            columnName = columnName.ToUpperInvariant();
+
+            int sum = 0;
+
+            for (int i = 0; i < columnName.Length; i++)
+            {
+                sum *= 26;
+                sum += (columnName[i] - 'A' + 1);
+            }
+
+            return sum;
         }
 
     }

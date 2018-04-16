@@ -24,18 +24,20 @@
   <Particular id="15" name="Verticals">
   </Particular>
 
-  <!--Validate Cost and billing Workbook columns and seatAllocation values before running the app-->
-  <Columns SeatAllcationOffShore="900" SeatAllcationOnShorePercnt=".24">
-    <EmployeeID>1</EmployeeID>
-    <EmployeeLastName>2</EmployeeLastName>
-    <EmloyeeFirstName>3</EmloyeeFirstName>
-    <EmployeeName>4</EmployeeName>
-    <GroupName>6</GroupName>
-    <ManagerName>7</ManagerName>
-    <Location>8</Location>
-    <CTC>9</CTC>
-    <Amount>11</Amount>
-    <TotalCost>10</TotalCost>
-    <ChangeInRevenue identifier="Billing Cycle" ParseTillSection="Odd Shift Cost">1</ChangeInRevenue>
+ <!--Validate Cost and billing Workbook columns and seatAllocation values before running the app-->
+  <Columns SeatAllcationOffShore="900" SeatAllcationOnShorePercnt=".24"
+           CostStartIndex="2" BillingStartIndex="3">
+    <EmployeeID>A</EmployeeID>
+    <EmployeeLastName>B</EmployeeLastName>
+    <EmloyeeFirstName>C</EmloyeeFirstName>
+    <EmployeeName>D</EmployeeName>
+    <GroupName>F</GroupName>
+    <ManagerName>G</ManagerName>
+    <Location>H</Location>
+    <Salary>I</Salary>
+    <TotalCost>J</TotalCost>
+    <Amount>K</Amount>
+
+    <ChangeInRevenue identifier="Billing Cycle" ParseTillSection="Odd Shift Cost">A</ChangeInRevenue>
   </Columns>
 </root>
