@@ -1,0 +1,17 @@
+D:\Ronson\POCProject\WindowsPOC\EntitiesLib\bin\Debug\ParticularsStructure.xml
+D:\Ronson\POCProject\WindowsPOC\EntitiesLib\bin\Debug\EntitiesLib.dll
+D:\Ronson\POCProject\WindowsPOC\EntitiesLib\bin\Debug\EntitiesLib.pdb
+D:\Ronson\POCProject\WindowsPOC\EntitiesLib\obj\Debug\EntitiesLib.dll
+D:\Ronson\POCProject\WindowsPOC\EntitiesLib\obj\Debug\EntitiesLib.pdb
+D:\Ronson\POCProject\WindowsPOC\EntitiesLib\obj\Debug\EntitiesLib.csprojResolveAssemblyReference.cache
+D:\Ronson\WindowsPOC\EntitiesLib\bin\Debug\Configuration.xml
+D:\Ronson\WindowsPOC\EntitiesLib\bin\Debug\EntitiesLib.dll
+D:\Ronson\WindowsPOC\EntitiesLib\bin\Debug\EntitiesLib.pdb
+D:\Ronson\WindowsPOC\EntitiesLib\bin\Debug\ICSharpCode.SharpZipLib.dll
+D:\Ronson\WindowsPOC\EntitiesLib\bin\Debug\NPOI.dll
+D:\Ronson\WindowsPOC\EntitiesLib\bin\Debug\NPOI.OOXML.dll
+D:\Ronson\WindowsPOC\EntitiesLib\bin\Debug\NPOI.OpenXml4Net.dll
+D:\Ronson\WindowsPOC\EntitiesLib\bin\Debug\NPOI.OpenXmlFormats.dll
+D:\Ronson\WindowsPOC\EntitiesLib\bin\Debug\NPOI.xml
+D:\Ronson\WindowsPOC\EntitiesLib\obj\Debug\EntitiesLib.dll
+D:\Ronson\WindowsPOC\EntitiesLib\obj\Debug\EntitiesLib.pdb
