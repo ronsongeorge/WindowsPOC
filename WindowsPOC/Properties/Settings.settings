@@ -8,5 +8,11 @@
     <Setting Name="FetchDataFromLocation" Type="System.String" Scope="Application">
       <Value Profile="(Default)">D:\\</Value>
     </Setting>
+    <Setting Name="OutputFolderPath" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">D:\WindowsPOC\</Value>
+    </Setting>
+    <Setting Name="PDFExportPath" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">D:\\</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

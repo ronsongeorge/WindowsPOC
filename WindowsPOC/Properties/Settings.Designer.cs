@@ -40,5 +40,23 @@ namespace WindowsPOC.Properties {
                 return ((string)(this["FetchDataFromLocation"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("D:\\WindowsPOC\\")]
+        public string OutputFolderPath {
+            get {
+                return ((string)(this["OutputFolderPath"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("D:\\\\")]
+        public string PDFExportPath {
+            get {
+                return ((string)(this["PDFExportPath"]));
+            }
+        }
     }
 }
