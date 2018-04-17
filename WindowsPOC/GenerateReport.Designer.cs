@@ -45,6 +45,7 @@
             this.btnReadData = new System.Windows.Forms.Button();
             this.btnUploadBilling = new System.Windows.Forms.Button();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.btnDisplayEmployeeModel = new System.Windows.Forms.Button();
             this.btnClear = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -118,7 +119,7 @@
             this.dataGridView1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataGridView1.Location = new System.Drawing.Point(0, 0);
             this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.Size = new System.Drawing.Size(646, 532);
+            this.dataGridView1.Size = new System.Drawing.Size(666, 319);
             this.dataGridView1.TabIndex = 7;
             // 
             // lblBillingCycle
@@ -222,6 +223,7 @@
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.Controls.Add(this.btnDisplayEmployeeModel);
             this.splitContainer1.Panel1.Controls.Add(this.btnClear);
             this.splitContainer1.Panel1.Controls.Add(this.btnExportPdf);
             this.splitContainer1.Panel1.Controls.Add(this.btnReadData);
@@ -238,9 +240,20 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.dataGridView1);
-            this.splitContainer1.Size = new System.Drawing.Size(646, 742);
-            this.splitContainer1.SplitterDistance = 206;
+            this.splitContainer1.Size = new System.Drawing.Size(666, 519);
+            this.splitContainer1.SplitterDistance = 196;
             this.splitContainer1.TabIndex = 16;
+            // 
+            // btnDisplayEmployeeModel
+            // 
+            this.btnDisplayEmployeeModel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnDisplayEmployeeModel.Location = new System.Drawing.Point(294, 168);
+            this.btnDisplayEmployeeModel.Name = "btnDisplayEmployeeModel";
+            this.btnDisplayEmployeeModel.Size = new System.Drawing.Size(124, 27);
+            this.btnDisplayEmployeeModel.TabIndex = 17;
+            this.btnDisplayEmployeeModel.Text = "Show Employee Data";
+            this.btnDisplayEmployeeModel.UseVisualStyleBackColor = true;
+            this.btnDisplayEmployeeModel.Click += new System.EventHandler(this.btnDisplayEmployeeModel_Click);
             // 
             // btnClear
             // 
@@ -259,7 +272,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(646, 742);
+            this.ClientSize = new System.Drawing.Size(666, 519);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.lblBillingCycle);
             this.Controls.Add(this.lblUploadBillingDetails);
@@ -300,6 +313,7 @@
         private System.Windows.Forms.Button btnUploadBilling;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.Button btnClear;
+        private System.Windows.Forms.Button btnDisplayEmployeeModel;
     }
 }
 

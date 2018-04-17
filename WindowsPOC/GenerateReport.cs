@@ -1,16 +1,14 @@
-﻿using EntitiesLib;
+﻿using DataLayer;
+using EntitiesLib;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace WindowsPOC
@@ -50,147 +48,47 @@ namespace WindowsPOC
                 ValidateUploadedFileForExtension(txtUploadBillingName, ref billingPath);
         }
 
-        private void btnGenerateReport_Click(object sender, EventArgs e)
+        private void btnClear_Click(object sender, EventArgs e)
         {
             dataGridView1.Rows.Clear();
+            dataGridView1.Columns.Clear();
+            cmbAccountName.SelectedIndex = -1;
+            cmbBillingCycle.SelectedIndex = -1;
+            txtEmpDetailsExcellName.Text = string.Empty;
+            txtUploadBillingName.Text = string.Empty;
 
-            if (CanGenerateReport())
-            {
-                vemp = new ProcessFiles();
-                var empData = vemp.ProcessEmpFiles(costPath, billingPath);
-                FillReportData(empData);
-                dataGridView1.Visible = true;
-                DisableControls();
-                MessageBox.Show("Date generated successfully");
-            }
-
-        }
-
-        private void btnExportExcel_Click(object sender, EventArgs e)
-        {
-            if (ExportDataToExcel())
-            {
-                MessageBox.Show("Report exported successfully to excel");
-            }
-            else
-            {
-                MessageBox.Show("Error while downloading the report to excel");
-            }
-        }
-
-        private void btnExportPdf_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                PdfPTable pdfTable = new PdfPTable(dataGridView1.ColumnCount);
-                pdfTable.DefaultCell.Padding = 3;
-                pdfTable.WidthPercentage = 30;
-                pdfTable.HorizontalAlignment = Element.ALIGN_LEFT;
-                pdfTable.DefaultCell.BorderWidth = 1;
-
-                //Adding Header row
-                foreach (DataGridViewColumn column in dataGridView1.Columns)
-                {
-                    PdfPCell cell = new PdfPCell(new Phrase(column.HeaderText));
-                    cell.BackgroundColor = new iTextSharp.text.BaseColor(240, 240, 240);
-                    pdfTable.AddCell(cell);
-                }
-
-                //Adding DataRow
-                foreach (DataGridViewRow row in dataGridView1.Rows)
-                {
-                    foreach (DataGridViewCell cell in row.Cells)
-                    {
-                        pdfTable.AddCell(cell.Value == null ? string.Empty : cell.Value.ToString());
-                    }
-                }
-
-                //Exporting to PDF
-                string folderPath = Properties.Settings.Default.PDFExportPath;
-                if (!Directory.Exists(folderPath))
-                {
-                    Directory.CreateDirectory(folderPath);
-                }
-                using (FileStream stream = new FileStream(folderPath + "DataGridViewExport.pdf", FileMode.Create))
-                {
-                    Document pdfDoc = new Document(PageSize.A2, 10f, 10f, 10f, 0f);
-                    PdfWriter.GetInstance(pdfDoc, stream);
-                    pdfDoc.Open();
-                    pdfDoc.Add(pdfTable);
-                    pdfDoc.Close();
-                    stream.Close();
-                }
-                MessageBox.Show("Report exported successfully to pdf");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error while export the file to pdf " + ex.Message);
-            }
-
-        }
-
-        private void btnReadData_Click(object sender, EventArgs e)
-        {
-            ReadAndPopulateDataFromExcelSheet();
         }
 
         #endregion
 
-        #region Methods
+        #region Generate Report Button Click Methods
 
-        private void DisableControls()
+        private void btnGenerateReport_Click(object sender, EventArgs e)
         {
-            btnExportExcel.Enabled = false;
-            btnExportPdf.Enabled = false;
-            if (dataGridView1.Rows.Count > 0)
-            {
-                btnExportExcel.Enabled = true;
-                btnExportPdf.Enabled = true;
-            }
-        }
+            dataGridView1.DataSource = null;
 
-        private void FillBillingCycleDropDown()
-        {
-            for (int dtime = 5; dtime > 0; dtime--)
+            if (CanGenerateReport())
             {
-                var getMonthName = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(DateTime.Now.AddMonths(-dtime).Month).Substring(0, 3).ToUpper() + "-";
-                var getYearName = DateTime.Now.AddMonths(-dtime).Year;
-                cmbBillingCycle.Items.Add(getMonthName + getYearName);
-            }
-        }
-
-        private void FillAccountDropDown()
-        {
-            for (int accint = 1; accint < 5; accint++)
-            {
-                cmbAccountName.Items.Add("Account-" + accint);
-            }
-        }
-
-        private void ValidateUploadedFileForExtension(TextBox txtBoxToValidate, ref string cPath)
-        {
-            string filePath = string.Empty;
-            string fileExt = string.Empty;
-            OpenFileDialog file = new OpenFileDialog(); //open dialog to choose file  
-            if (file.ShowDialog() == System.Windows.Forms.DialogResult.OK) //if there is a file choosen by the user  
-            {
-                filePath = file.FileName; //get the path of the file  
-                fileExt = Path.GetExtension(filePath); //get the file extension 
-                if (fileExt.CompareTo(".xls") == 0 || fileExt.CompareTo(".xlsx") == 0)
+                vemp = new ProcessFiles();
+                List<string> errorMsgs;
+                var empData = vemp.ProcessEmpFiles(costPath, billingPath, out errorMsgs);
+                if (errorMsgs.Count() == 0)
                 {
-                    try
-                    {
-                        txtBoxToValidate.Text = filePath;
-                        cPath = filePath;
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show(ex.Message.ToString());
-                    }
+                    FillReportData(empData);
+                    dataGridView1.Visible = true;
+                    DisableControls();
+                    MessageBox.Show("Date generated successfully");
                 }
                 else
                 {
-                    MessageBox.Show("Please choose .xls or .xlsx file only.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Error); //custom messageBox to show error  
+                    dataGridView1.ColumnCount = 1;
+                    dataGridView1.Columns[0].Name = "Errors";
+                    foreach (string listItem in errorMsgs)
+                    {
+                        dataGridView1.Rows.Add(listItem);
+                    }
+                    dataGridView1.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+                    MessageBox.Show("Cannot proceed as discripencies found in data!");
                 }
             }
         }
@@ -224,9 +122,11 @@ namespace WindowsPOC
             return true;
         }
 
-        private decimal CalculateMargin(decimal parameter1, decimal parameter2)
+        private void FillReportData(List<EmployeeDetails> empData)
         {
-            return ((parameter1 - parameter2) / parameter1);
+            var verticals = empData.Select(a => a.VerticalName).Distinct();
+            CreateColumnsForGrid(verticals);
+            UploadDataForSingleMonth(cmbBillingCycle.SelectedText, verticals, empData);
         }
 
         private void CreateColumnsForGrid(IEnumerable<string> VerticalNames)
@@ -333,47 +233,66 @@ namespace WindowsPOC
         private void CalculateDataUsingFormula(List<EmployeeDetails> empData, IEnumerable<string> verticals)
         {
             var updateColumnName = cmbBillingCycle.SelectedItem.ToString();
+
             //------------Financial Data
-            dataGridView1.Rows[1].Cells[updateColumnName].Value = String.Format("{0:F2}", empData.Select(a => a.Revenue).Sum());
-            dataGridView1.Rows[2].Cells[updateColumnName].Value = String.Format("{0:F2}", (((empData.Select(a => a.Revenue).Sum() - empData.Select(a => a.Salary).Sum()) / empData.Select(a => a.Revenue).Sum()) * 100));
-            dataGridView1.Rows[3].Cells[updateColumnName].Value = String.Format("{0:F2}", (((empData.Where(a => a.IsOnsite).Select(a => a.Revenue).Sum() - empData.Where(a => a.IsOnsite).Select(a => a.Salary).Sum()) / empData.Where(a => a.IsOnsite).Select(a => a.Revenue).Sum()) * 100));
-            dataGridView1.Rows[4].Cells[updateColumnName].Value = String.Format("{0:F2}", (((empData.Where(a => !a.IsOnsite).Select(a => a.Revenue).Sum() - empData.Where(a => !a.IsOnsite).Select(a => a.Salary).Sum()) / empData.Where(a => !a.IsOnsite).Select(a => a.Revenue).Sum()) * 100));
+            var getFullRevenue = Calculate.CalculateSum(empData, CalculationType.Revenue, CalculationType.None);
+            var getFullSalary = Calculate.CalculateSum(empData, CalculationType.Salary, CalculationType.None);
+            var getOnsiteRevenue = Calculate.CalculateSum(empData, CalculationType.Revenue, CalculationType.IsOnsite);
+            var getOnsiteSalary = Calculate.CalculateSum(empData, CalculationType.Salary, CalculationType.IsOnsite);
+            var getOnShoreRevenue = Calculate.CalculateSum(empData, CalculationType.Revenue, CalculationType.IsOffShore);
+            var getOnShoreSalary = Calculate.CalculateSum(empData, CalculationType.Salary, CalculationType.IsOffShore);
+
+            dataGridView1.Rows[1].Cells[updateColumnName].Value = String.Format("{0:F2}", getFullRevenue);
+            dataGridView1.Rows[2].Cells[updateColumnName].Value = String.Format("{0:F2}", Calculate.CalculateGM(getFullRevenue, getFullSalary, true));
+            dataGridView1.Rows[3].Cells[updateColumnName].Value = String.Format("{0:F2}", Calculate.CalculateGM(getOnsiteRevenue, getOnsiteSalary, true));
+            dataGridView1.Rows[4].Cells[updateColumnName].Value = String.Format("{0:F2}", Calculate.CalculateGM(getOnShoreRevenue, getOnShoreSalary, true));
+
             //------------Resource Counts Data
+
             dataGridView1.Rows[6].Cells[updateColumnName].Value = empData.Count();
             dataGridView1.Rows[7].Cells[updateColumnName].Value = empData.Where(a => a.IsOnsite).Count();
             dataGridView1.Rows[8].Cells[updateColumnName].Value = empData.Where(a => !a.IsOnsite).Count();
+
             //------------Account Management Count
             dataGridView1.Rows[9].Cells[updateColumnName].Value = empData.Where(a => a.AccountID == 1).Count();
+
             //------------Account MGMT Cost
-            dataGridView1.Rows[11].Cells[updateColumnName].Value = String.Format("{0:F2}", ((empData.Where(a => a.AccountID == 1).Select(a => a.Salary).Sum()) / empData.Select(a => a.Revenue).Sum() * 100));
+            var mgmCost = Calculate.CalculateSum(empData, CalculationType.Salary, CalculationType.IsAccMgmt);
+            dataGridView1.Rows[11].Cells[updateColumnName].Value = String.Format("{0:F2}", Calculate.CalculatePercent(mgmCost, getFullRevenue));
+
             //------------NB Count
             dataGridView1.Rows[12].Cells[updateColumnName].Value = empData.Where(a => !a.IsBillable).Count();
+
             //------------NB Cost
-            dataGridView1.Rows[14].Cells[updateColumnName].Value = String.Format("{0:F2}", ((empData.Where(a => !a.IsBillable).Select(a => a.Salary).Sum()) / empData.Select(a => a.Revenue).Sum() * 100));
+            var nbCost = Calculate.CalculateSum(empData, CalculationType.Salary, CalculationType.IsNonBillable);
+            dataGridView1.Rows[14].Cells[updateColumnName].Value = String.Format("{0:F2}", Calculate.CalculatePercent(nbCost, getFullRevenue));
 
             //----------------Calculations According to verticals
             int colno = 17;
             foreach (var vert in verticals)
             {
-                var totalrev = empData.Select(a => a.Revenue).Sum();
-                var verticalrev = empData.Where(a => a.VerticalName == vert).Select(a => a.Revenue).Sum();
-                dataGridView1.Rows[colno].Cells[updateColumnName].Value = String.Format("{0:F2}", ((totalrev == 0 ? 0 : verticalrev / totalrev) * 100));
+                //% of Rev
+                var verticalrev = Calculate.CalculateSumWithVerticalName(empData, CalculationType.Revenue, CalculationType.None, vert);
+                dataGridView1.Rows[colno].Cells[updateColumnName].Value = String.Format("{0:F2}", Calculate.CalculatePercent(verticalrev, getFullRevenue));
                 colno++;
-                var onsiterev = empData.Where(a => a.VerticalName == vert).Select(a => a.Revenue).Sum();
-                var verticalonsiterev = empData.Where(a => a.VerticalName == vert && a.IsOnsite).Select(a => a.Revenue).Sum();
-                dataGridView1.Rows[colno].Cells[updateColumnName].Value = String.Format("{0:F2}", (onsiterev == 0 ? 0 : (verticalonsiterev / onsiterev) * 100));
+
+                //Onsite % of Rev
+                var verticalonsiterev = Calculate.CalculateSumWithVerticalName(empData, CalculationType.Revenue, CalculationType.IsOnsite, vert); //empData.Where(a => a.VerticalName == vert && a.IsOnsite).Select(a => a.Revenue).Sum();
+                dataGridView1.Rows[colno].Cells[updateColumnName].Value = String.Format("{0:F2}", Calculate.CalculatePercent(verticalonsiterev, verticalrev));
                 colno++;
-                var offshorerev = empData.Where(a => a.VerticalName == vert).Select(a => a.Revenue).Sum();
-                var verticaloffshorerev = empData.Where(a => a.VerticalName == vert && !a.IsOnsite).Select(a => a.Revenue).Sum();
-                dataGridView1.Rows[colno].Cells[updateColumnName].Value = String.Format("{0:F2}", (offshorerev == 0 ? 0 : (verticaloffshorerev / offshorerev) * 100));
+
+                //Offshore % of Rev
+                var verticaloffshorerev = Calculate.CalculateSumWithVerticalName(empData, CalculationType.Revenue, CalculationType.IsOffShore, vert);//empData.Where(a => a.VerticalName == vert && !a.IsOnsite).Select(a => a.Revenue).Sum();
+                dataGridView1.Rows[colno].Cells[updateColumnName].Value = String.Format("{0:F2}", Calculate.CalculatePercent(verticaloffshorerev, verticalrev));//(offshorerev == 0 ? 0 : (verticaloffshorerev / offshorerev) * 100));
                 colno++;
-                var onsitegm = empData.Where(a => a.VerticalName == vert).Select(a => a.Revenue).Sum();
-                var verticalonsitegm = empData.Where(a => a.VerticalName == vert).Select(a => a.Revenue).Sum();
-                dataGridView1.Rows[colno].Cells[updateColumnName].Value = String.Format("{0:F2}", (onsitegm == 0 ? 0 : (onsitegm - verticalonsitegm) / onsitegm));
+
+                //Onsite GM
+                dataGridView1.Rows[colno].Cells[updateColumnName].Value = String.Format("{0:F2}", Calculate.CalculateGM(verticalonsiterev, verticalrev, true));//(onsitegm == 0 ? 0 : (onsitegm - verticalonsitegm) / onsitegm));
                 colno++;
-                var offshoregm = empData.Where(a => a.VerticalName == vert).Select(a => a.Revenue).Sum();
-                var verticaloffshoregm = empData.Where(a => a.VerticalName == vert).Select(a => a.Revenue).Sum();
-                dataGridView1.Rows[colno].Cells[updateColumnName].Value = String.Format("{0:F2}", (offshoregm == 0 ? 0 : (offshoregm - verticaloffshoregm) / offshoregm));
+
+                //Offshore GM
+                var verticaloffshoregm = Calculate.CalculateSumWithVerticalName(empData, CalculationType.Salary, CalculationType.None, vert);
+                dataGridView1.Rows[colno].Cells[updateColumnName].Value = String.Format("{0:F2}", Calculate.CalculateGM(verticaloffshorerev, verticaloffshoregm, true));//(offshoregm == 0 ? 0 : (offshoregm - verticaloffshoregm) / offshoregm));
                 colno += 2;
             }
             //-----------------------------------------------------------------------
@@ -438,12 +357,133 @@ namespace WindowsPOC
             }
 
         }
-
-        private void FillReportData(List<EmployeeDetails> empData)
+                
+        private void DisableControls()
         {
-            var verticals = empData.Select(a => a.VerticalName).Distinct();
-            CreateColumnsForGrid(verticals);
-            UploadDataForSingleMonth(cmbBillingCycle.SelectedText, verticals, empData);
+            btnExportExcel.Enabled = false;
+            btnExportPdf.Enabled = false;
+            if (dataGridView1.Rows.Count > 0)
+            {
+                btnExportExcel.Enabled = true;
+                btnExportPdf.Enabled = true;
+            }
+        }
+
+        #endregion
+
+        #region Event Validation
+
+        private void FillBillingCycleDropDown()
+        {
+            for (int dtime = 5; dtime > 0; dtime--)
+            {
+                var getMonthName = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(DateTime.Now.AddMonths(-dtime).Month).Substring(0, 3).ToUpper() + "-";
+                var getYearName = DateTime.Now.AddMonths(-dtime).Year;
+                cmbBillingCycle.Items.Add(getMonthName + getYearName);
+            }
+        }
+
+        private void FillAccountDropDown()
+        {
+            for (int accint = 1; accint < 5; accint++)
+            {
+                cmbAccountName.Items.Add("Account-" + accint);
+            }
+        }
+
+        private void ValidateUploadedFileForExtension(TextBox txtBoxToValidate, ref string cPath)
+        {
+            string filePath = string.Empty;
+            string fileExt = string.Empty;
+            OpenFileDialog file = new OpenFileDialog(); //open dialog to choose file  
+            if (file.ShowDialog() == System.Windows.Forms.DialogResult.OK) //if there is a file choosen by the user  
+            {
+                filePath = file.FileName; //get the path of the file  
+                fileExt = Path.GetExtension(filePath); //get the file extension 
+                if (fileExt.CompareTo(".xls") == 0 || fileExt.CompareTo(".xlsx") == 0)
+                {
+                    try
+                    {
+                        txtBoxToValidate.Text = filePath;
+                        cPath = filePath;
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message.ToString());
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Please choose .xls or .xlsx file only.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Error); //custom messageBox to show error  
+                }
+            }
+        }
+
+        #endregion
+
+        #region Export Data
+
+        private void btnExportExcel_Click(object sender, EventArgs e)
+        {
+            if (ExportDataToExcel())
+            {
+                MessageBox.Show("Report exported successfully to excel");
+            }
+            else
+            {
+                MessageBox.Show("Error while downloading the report to excel");
+            }
+        }
+
+        private void btnExportPdf_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                PdfPTable pdfTable = new PdfPTable(dataGridView1.ColumnCount);
+                pdfTable.DefaultCell.Padding = 3;
+                pdfTable.WidthPercentage = 30;
+                pdfTable.HorizontalAlignment = Element.ALIGN_LEFT;
+                pdfTable.DefaultCell.BorderWidth = 1;
+
+                //Adding Header row
+                foreach (DataGridViewColumn column in dataGridView1.Columns)
+                {
+                    PdfPCell cell = new PdfPCell(new Phrase(column.HeaderText));
+                    cell.BackgroundColor = new iTextSharp.text.BaseColor(240, 240, 240);
+                    pdfTable.AddCell(cell);
+                }
+
+                //Adding DataRow
+                foreach (DataGridViewRow row in dataGridView1.Rows)
+                {
+                    foreach (DataGridViewCell cell in row.Cells)
+                    {
+                        pdfTable.AddCell(cell.Value == null ? string.Empty : cell.Value.ToString());
+                    }
+                }
+
+                //Exporting to PDF
+                string folderPath = Properties.Settings.Default.PDFExportPath;
+                if (!Directory.Exists(folderPath))
+                {
+                    Directory.CreateDirectory(folderPath);
+                }
+                using (FileStream stream = new FileStream(folderPath + "DataGridViewExport.pdf", FileMode.Create))
+                {
+                    Document pdfDoc = new Document(PageSize.A2, 10f, 10f, 10f, 0f);
+                    PdfWriter.GetInstance(pdfDoc, stream);
+                    pdfDoc.Open();
+                    pdfDoc.Add(pdfTable);
+                    pdfDoc.Close();
+                    stream.Close();
+                }
+                MessageBox.Show("Report exported successfully to pdf");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error while export the file to pdf " + ex.Message);
+            }
+
         }
 
         private bool ExportDataToExcel()
@@ -512,6 +552,15 @@ namespace WindowsPOC
             }
         }
 
+        #endregion
+
+        #region Display uploaded Employee Data
+
+        private void btnReadData_Click(object sender, EventArgs e)
+        {
+            ReadAndPopulateDataFromExcelSheet();
+        }
+
         //Populate Previous Data
         private void ReadAndPopulateDataFromExcelSheet()
         {
@@ -558,21 +607,22 @@ namespace WindowsPOC
                     dataGridView1.Rows[i].Cells[j].Value = wks.Cells[i + 2, j + 1].Text;
                 }
             }
-
             MessageBox.Show("Data read successfully");
         }
 
-        #endregion
-
-        private void btnClear_Click(object sender, EventArgs e)
+        private void btnDisplayEmployeeModel_Click(object sender, EventArgs e)
         {
-            dataGridView1.Rows.Clear();
-            dataGridView1.Columns.Clear();
-            cmbAccountName.SelectedIndex = -1;
-            cmbBillingCycle.SelectedIndex = -1;
-            txtEmpDetailsExcellName.Text = string.Empty;
-            txtUploadBillingName.Text = string.Empty;
+            vemp = new ProcessFiles();
+            List<string> errorMsgs;
+            var empData = vemp.ProcessEmpFiles(costPath, billingPath, out errorMsgs);
+            if (errorMsgs.Count() == 0)
+                dataGridView1.DataSource = empData;
+            else
+                dataGridView1.DataSource = errorMsgs;
 
         }
+
+        #endregion
+        
     }
 }

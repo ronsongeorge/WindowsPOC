@@ -131,6 +131,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DataLayer\DataLayer.csproj">
+      <Project>{7e77550f-70a8-4d2e-bea2-ac720715bf6d}</Project>
+      <Name>DataLayer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EntitiesLib\EntitiesLib.csproj">
       <Project>{39d08f05-3fbb-4689-ba3a-3c5548ee7d7a}</Project>
       <Name>EntitiesLib</Name>
@@ -161,12 +165,12 @@
   <ItemGroup>
     <PublishFile Include="Configuration.xml">
       <Visible>False</Visible>
+      <PublishState>Include</PublishState>
+      <IncludeHash>True</IncludeHash>
       <Group>
       </Group>
       <TargetPath>
       </TargetPath>
-      <PublishState>Include</PublishState>
-      <IncludeHash>True</IncludeHash>
       <FileType>File</FileType>
     </PublishFile>
   </ItemGroup>
