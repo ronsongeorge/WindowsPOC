@@ -85,6 +85,7 @@ namespace WindowsPOC
                     dataGridView1.Columns[0].Name = "Errors";
                     foreach (string listItem in errorMsgs)
                     {
+                        dataGridView1.DefaultCellStyle.ForeColor = Color.Red;
                         dataGridView1.Rows.Add(listItem);
                     }
                     dataGridView1.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
@@ -124,7 +125,8 @@ namespace WindowsPOC
 
         private void FillReportData(List<EmployeeDetails> empData)
         {
-            var verticals = empData.Select(a => a.VerticalName).Distinct();
+            var excludedGroupNames = Properties.Settings.Default.GroupNameExclude.Split(',');
+            var verticals = empData.Where(a => !excludedGroupNames.Contains(a.VerticalName)).Select(a => a.VerticalName).Distinct();
             CreateColumnsForGrid(verticals);
             UploadDataForSingleMonth(cmbBillingCycle.SelectedText, verticals, empData);
         }
@@ -173,7 +175,8 @@ namespace WindowsPOC
                         var row = this.dataGridView1.Rows[rowIndex];
                         row.Cells[1].Value = vert;
                         row.DefaultCellStyle.BackColor = Color.LightBlue;
-                        string[] testarray = { "% of Rev", "Onsite % of Rev", "Offshore % of Rev", "Onsite GM", "Offshore GM" };
+
+                        string[] testarray = Properties.Settings.Default.VerticalsSubSection.Split(',');//{ "% of Rev", "Onsite % of Rev", "Offshore % of Rev", "Onsite GM", "Offshore GM" };
                         foreach (string b in testarray)
                         {
                             int rowIndex1 = this.dataGridView1.Rows.Add();
@@ -354,6 +357,11 @@ namespace WindowsPOC
                     }
 
                 } colno++;
+            }
+
+            for (int colcnt = 0; colcnt <= dataGridView1.Columns.Count - 1; colcnt++)
+            {
+                dataGridView1.Columns[colcnt].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
             }
 
         }

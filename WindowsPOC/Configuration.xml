@@ -24,6 +24,8 @@
   <Particular id="15" name="Verticals">
   </Particular>
 
+  <GroupNames exclude="PMO,Account Management"></GroupNames>
+
   <!--Validate Cost and billing Workbook columns and seatAllocation values before running the app-->
   <Columns SeatAllcationOffShore="900" SeatAllcationOnShorePercnt=".24"
            CostStartIndex="2" BillingStartIndex="3">

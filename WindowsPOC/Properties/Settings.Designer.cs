@@ -58,5 +58,26 @@ namespace WindowsPOC.Properties {
                 return ((string)(this["PDFExportPath"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("PMO,Account Management")]
+        public string GroupNameExclude {
+            get {
+                return ((string)(this["GroupNameExclude"]));
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("% of Rev,Onsite % of Rev,Offshore % of Rev,Onsite GM,Offshore GM")]
+        public string VerticalsSubSection {
+            get {
+                return ((string)(this["VerticalsSubSection"]));
+            }
+            set {
+                this["VerticalsSubSection"] = value;
+            }
+        }
     }
 }
