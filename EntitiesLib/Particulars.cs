@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
 using System.Xml.Linq;
 
 namespace EntitiesLib
@@ -14,8 +11,7 @@ namespace EntitiesLib
         public int ParticularsID { get; set; }
         public string ParticularsName { get; set; }
         public List<ParticularsSubType> ParticularsSubTypes { get; set; }
-
-
+        
         public List<Particulars> GetAllParticulars()
         {
             return FetchDataFromXML();

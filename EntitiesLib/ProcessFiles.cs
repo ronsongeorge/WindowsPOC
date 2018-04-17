@@ -1,7 +1,5 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -9,17 +7,18 @@ using System.Xml.Linq;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 
-
 namespace EntitiesLib
 {
     public class ProcessFiles
     {
 
         XDocument doc = new XDocument();
-        List<EmployeeDetails> EmployeeObject = null;
+        List<EmployeeDetails> EmployeeObjtList = null;
+        List<string> ErrorMessage = null;
 
-        public List<EmployeeDetails> ProcessEmpFiles(string pathCost, string pathBilling)
+        public List<EmployeeDetails> ProcessEmpFiles(string pathCost, string pathBilling, out List<string> ErrorMessage)
         {
+            ErrorMessage = new List<string>();
             var path = Assembly.GetExecutingAssembly().Location;
             path = path.Substring(0, path.LastIndexOf('\\')) + "\\" + "Configuration.xml";
             doc = XDocument.Load(path);
@@ -31,10 +30,11 @@ namespace EntitiesLib
             {
                 workbook = new XSSFWorkbook(stream);
             }
-            EmployeeObject = new List<EmployeeDetails>();
+            EmployeeObjtList = new List<EmployeeDetails>();
             ISheet sheet = workbook.GetSheetAt(0); // zero-based index of your target sheet
             EmployeeDetails emp = null;
             int rowIndex = 0;
+            decimal salary;
 
             #region ColumnIndex variables
             int CostStartIndex = int.Parse(columns.Attribute("CostStartIndex").Value);
@@ -50,7 +50,7 @@ namespace EntitiesLib
             foreach (IRow row in sheet)
             {
                 // skip header row
-                if (rowIndex++ == CostStartIndex - 1) continue;
+                if (rowIndex++ < CostStartIndex - 1) continue;
                 try
                 {
                     emp = new EmployeeDetails();
@@ -59,31 +59,65 @@ namespace EntitiesLib
                     {
                         emp.EmployeeID = Convert.ToInt16(row.Cells[EmployeeID - 1].ToString());
                     }
-                    catch
+                    catch (Exception ex)
                     {
-                        // junk data ; continue
+                        if (row.Cells[0].ToString().ToUpper().Contains("SUBTOTAL"))
+                            break;
+                        else
+                            throw ex;
+
+                    }
+                    if (!string.IsNullOrWhiteSpace(row.Cells[EmloyeeFirstName - 1].ToString()) &&
+                                          !string.IsNullOrWhiteSpace(row.Cells[EmployeeLastName - 1].ToString()))
+                    {
+                        emp.EmployeeName = string.Format("{0} {1}", row.Cells[EmloyeeFirstName - 1].ToString(),
+                       row.Cells[EmployeeLastName - 1].ToString());
+                    }
+                    else
+                    {
+                        ErrorMessage.Add(string.Format("Proper Employee name not found at row :{0} in file:{1}", row.RowNum, pathCost));
                         continue;
                     }
 
-                    emp.EmployeeName = string.Format("{0} {1}", row.Cells[EmloyeeFirstName - 1].ToString(),
-                        row.Cells[EmployeeLastName - 1].ToString());
                     emp.IsOnsite = row.Cells[Location - 1].ToString().ToLower().Equals("india") ? false : true;
-                    emp.VerticalName = row.Cells[GroupName - 1].ToString();
-                    emp.ManagerName = row.Cells[ManagerName - 1].ToString();
-                    emp.Salary = Decimal.Parse(row.Cells[Salary - 1].ToString().Replace("$", "").Replace(",", "")) / 12;
+
+                    if (!string.IsNullOrWhiteSpace(row.Cells[GroupName - 1].ToString()))
+                        emp.VerticalName = row.Cells[GroupName - 1].ToString();
+                    else
+                    {
+                        ErrorMessage.Add(string.Format("VerticalName not found at row :{0} in file:{1}", row.RowNum, pathCost));
+                        continue;
+
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(row.Cells[ManagerName - 1].ToString()))
+                        emp.ManagerName = row.Cells[ManagerName - 1].ToString();
+                    else
+                    {
+                        ErrorMessage.Add(string.Format("ManagerName not found at row :{0} in file:{1}", row.RowNum, pathCost));
+                        continue;
+                    }
+
+                    if (decimal.TryParse(row.Cells[Salary - 1].NumericCellValue.ToString(), out salary))
+                        emp.Salary = (decimal)row.Cells[Salary - 1].NumericCellValue / 12;
+                    else
+                    {
+                        ErrorMessage.Add(string.Format("Cannot parse Salary at row :{0} in file:{1}", row.RowNum, pathCost));
+                        continue;
+                    }
 
                     emp.AccountID = 0;
                     if (emp.VerticalName.ToLower().Equals("pmo") || emp.VerticalName.ToLower().Equals("account management"))
                         emp.AccountID = 1;
 
                     //add object to list
-                    if (!EmployeeObject.Any(e => e.EmployeeID == emp.EmployeeID))
+                    if (!EmployeeObjtList.Any(e => e.EmployeeID == emp.EmployeeID))
                     {
-                        EmployeeObject.Add(emp);
+                        EmployeeObjtList.Add(emp);
                     }
                     else
                     {
-                        throw new Exception(string.Format("Duplicate Employee ID Found:{0}", emp.EmployeeID));
+                        ErrorMessage.Add(string.Format("Duplicate Employee ID Found:{0} in cost file: {1}", emp.EmployeeID, pathCost));
 
                     }
                 }
@@ -94,13 +128,13 @@ namespace EntitiesLib
 
             }
 
-            if (ValidateEmpDetails(pathBilling, columns))
-                return EmployeeObject;
+            if (ValidateEmpDetails(pathBilling, columns, ref ErrorMessage) && ErrorMessage.Count == 0)
+                return EmployeeObjtList;
             else
                 return null;
         }
 
-        private bool ValidateEmpDetails(string pathBilling, XElement columns)
+        private bool ValidateEmpDetails(string pathBilling, XElement columns, ref List<string> errorMsg)
         {
             bool isSucess = false;
             IWorkbook workbook;
@@ -116,6 +150,8 @@ namespace EntitiesLib
             bool IsTotalCostCol = false;
             decimal tempRevenue;
             string identifier = string.Empty;
+            List<int> empIdList = new List<int>();
+            int emdId = 0;
 
             #region ColumnIndex variables
             int BillingStartIndex = int.Parse(columns.Attribute("BillingStartIndex").Value);
@@ -128,6 +164,34 @@ namespace EntitiesLib
             int SeatAllcationOffShore = int.Parse(columns.Attribute("SeatAllcationOffShore").Value);
             decimal SeatAllcationOnShorePercnt = decimal.Parse(columns.Attribute("SeatAllcationOnShorePercnt").Value);
             # endregion
+
+            foreach (IRow row in sheet)
+            {
+                if (rowIndex++ < BillingStartIndex - 1) continue;
+                identifier = row.Cells[identifierColumn - 1].ToString();
+                try
+                {
+                    if (identifier.ToLower().Contains(identifierTxt.ToLower()))
+                        break;
+                    emdId = Convert.ToInt16(row.Cells[empIdColumn - 1].ToString());
+                    empIdList.Add(emdId);
+                }
+                catch (Exception ex)
+                {
+
+
+                }
+
+            }
+
+            foreach (EmployeeDetails e in EmployeeObjtList)
+            {
+                if (!empIdList.Contains(e.EmployeeID))
+                {
+                    errorMsg.Add(string.Format("Employee ID: {0} does not exist in billing file: {1} ", e.EmployeeID, pathBilling));
+                }
+
+            }
 
             foreach (IRow row in sheet)
             {
@@ -148,28 +212,28 @@ namespace EntitiesLib
 
                     id = Convert.ToInt16(row.Cells[empIdColumn - 1].ToString());
 
-                    if (EmployeeObject.Any(e => e.EmployeeID == id))
+                    if (EmployeeObjtList.Any(e => e.EmployeeID == id))
                     {
 
                         if (!IsTotalCostCol)
                         {
                             if (decimal.TryParse(row.Cells[amountColumn - 1].NumericCellValue.ToString(), out value) && value != 0)
                             {
-                                EmployeeObject.Where(e => e.EmployeeID == id).FirstOrDefault().Revenue = value;
-                                EmployeeObject.Where(e => e.EmployeeID == id).FirstOrDefault().IsBillable = true;
+                                EmployeeObjtList.Where(e => e.EmployeeID == id).FirstOrDefault().Revenue = value;
+                                EmployeeObjtList.Where(e => e.EmployeeID == id).FirstOrDefault().IsBillable = true;
                             }
                             else
                             {
-                                EmployeeObject.Where(e => e.EmployeeID == id).FirstOrDefault().IsBillable = false;
+                                EmployeeObjtList.Where(e => e.EmployeeID == id).FirstOrDefault().IsBillable = false;
                             }
 
-                            if (EmployeeObject.Where(e => e.EmployeeID == id).FirstOrDefault().IsOnsite == false)
+                            if (EmployeeObjtList.Where(e => e.EmployeeID == id).FirstOrDefault().IsOnsite == false)
                             {
-                                EmployeeObject.Where(e => e.EmployeeID == id).FirstOrDefault().Revenue += SeatAllcationOffShore;
+                                EmployeeObjtList.Where(e => e.EmployeeID == id).FirstOrDefault().Salary += SeatAllcationOffShore;
                             }
                             else
                             {
-                                EmployeeObject.Where(e => e.EmployeeID == id).FirstOrDefault().Revenue += EmployeeObject.Where(e => e.EmployeeID == id).FirstOrDefault().Salary * (SeatAllcationOnShorePercnt);
+                                EmployeeObjtList.Where(e => e.EmployeeID == id).FirstOrDefault().Salary += EmployeeObjtList.Where(e => e.EmployeeID == id).FirstOrDefault().Salary * (SeatAllcationOnShorePercnt);
                             }
 
                         }
@@ -177,8 +241,8 @@ namespace EntitiesLib
                         {
                             if (decimal.TryParse(row.Cells[TotalCost - 1].NumericCellValue.ToString(), out value) && value != 0)
                             {
-                                tempRevenue = EmployeeObject.Where(e => e.EmployeeID == id).FirstOrDefault().Revenue;
-                                EmployeeObject.Where(e => e.EmployeeID == id).FirstOrDefault().Revenue = tempRevenue + value;
+                                tempRevenue = EmployeeObjtList.Where(e => e.EmployeeID == id).FirstOrDefault().Revenue;
+                                EmployeeObjtList.Where(e => e.EmployeeID == id).FirstOrDefault().Revenue = tempRevenue + value;
 
 
                             }
@@ -186,10 +250,10 @@ namespace EntitiesLib
                         }
 
                     }
-                    else// CLIENT OR NEW MEMEBER?
+                    else// CLIENT OR NEW MEMBER?
                     {
 
-
+                        errorMsg.Add(string.Format("Employee ID: {0} does not exist in cost file {1} ", id, pathBilling));
                     }
                 }
                 catch
@@ -221,4 +285,5 @@ namespace EntitiesLib
         }
 
     }
+
 }

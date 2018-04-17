@@ -57,6 +57,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CalculationType.cs" />
     <Compile Include="EmployeeDetails.cs" />
     <Compile Include="Particulars.cs">
       <SubType>Code</SubType>
