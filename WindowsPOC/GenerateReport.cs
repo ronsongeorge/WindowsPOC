@@ -16,9 +16,12 @@ namespace WindowsPOC
     public partial class GenerateReport : Form
     {
         #region Properties
+
         ProcessFiles vemp;
         string costPath;
         string billingPath;
+        public string selectedAccountName;
+
         #endregion
 
         public GenerateReport()
@@ -50,13 +53,20 @@ namespace WindowsPOC
 
         private void btnClear_Click(object sender, EventArgs e)
         {
-            dataGridView1.Rows.Clear();
-            dataGridView1.Columns.Clear();
+            ClearData();
             cmbAccountName.SelectedIndex = -1;
             cmbBillingCycle.SelectedIndex = -1;
+        }
+
+        private void ClearData()
+        {
+            dataGridView1.DataSource = null;
+            dataGridView1.Rows.Clear();
+            dataGridView1.Columns.Clear();
+            //cmbAccountName.SelectedIndex = -1;
+            //cmbBillingCycle.SelectedIndex = -1;
             txtEmpDetailsExcellName.Text = string.Empty;
             txtUploadBillingName.Text = string.Empty;
-
         }
 
         #endregion
@@ -70,27 +80,34 @@ namespace WindowsPOC
             if (CanGenerateReport())
             {
                 vemp = new ProcessFiles();
-                List<string> errorMsgs;
-                var empData = vemp.ProcessEmpFiles(costPath, billingPath, out errorMsgs);
-                if (errorMsgs.Count() == 0)
+                List<ErrorMessage> errorMsgs = new List<ErrorMessage>();
+                var empData = vemp.ProcessEmpFiles(costPath, billingPath, ref errorMsgs);
+
+                if (errorMsgs.Count() > 0)
+                {
+                    var msgResult = MessageBox.Show("There are few discripencies in the file.\nDo you like to continue","Discripency Alert",MessageBoxButtons.YesNo);
+                    if (msgResult == System.Windows.Forms.DialogResult.Yes)
+                    {
+                        FillReportData(empData);
+                        dataGridView1.Visible = true;
+                        DisableControls();
+                        MessageBox.Show("Date generated successfully");
+                    }else
+                    {
+                        ClearData();
+                        dataGridView1.DefaultCellStyle.ForeColor = Color.Red;
+                        dataGridView1.DataSource = errorMsgs;                    
+                        dataGridView1.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+                        dataGridView1.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+                        MessageBox.Show("Cannot proceed as discripencies found in data!");
+                    }
+                }else
                 {
                     FillReportData(empData);
                     dataGridView1.Visible = true;
                     DisableControls();
                     MessageBox.Show("Date generated successfully");
-                }
-                else
-                {
-                    dataGridView1.ColumnCount = 1;
-                    dataGridView1.Columns[0].Name = "Errors";
-                    foreach (string listItem in errorMsgs)
-                    {
-                        dataGridView1.DefaultCellStyle.ForeColor = Color.Red;
-                        dataGridView1.Rows.Add(listItem);
-                    }
-                    dataGridView1.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
-                    MessageBox.Show("Cannot proceed as discripencies found in data!");
-                }
+                }                
             }
         }
 
@@ -213,28 +230,22 @@ namespace WindowsPOC
 
             //----------------Calculations According to verticals
             int rowno = 17;
+            int verticalsubSecCount = Properties.Settings.Default.VerticalsSubSection.Split(',').Length;
             foreach (var vert in verticals)
-            {
-                dataGridView1.Rows[rowno].Cells[setcellName].Value = defaultVal;
-                dataGridView1.Rows[rowno].Cells[setCmbVal].Value = defaultVal;
-                rowno++;
-                dataGridView1.Rows[rowno].Cells[setcellName].Value = defaultVal;
-                dataGridView1.Rows[rowno].Cells[setCmbVal].Value = defaultVal;
-                rowno++;
-                dataGridView1.Rows[rowno].Cells[setcellName].Value = defaultVal;
-                dataGridView1.Rows[rowno].Cells[setCmbVal].Value = defaultVal;
-                rowno++;
-                dataGridView1.Rows[rowno].Cells[setcellName].Value = defaultVal;
-                dataGridView1.Rows[rowno].Cells[setCmbVal].Value = defaultVal;
-                rowno++;
-                dataGridView1.Rows[rowno].Cells[setcellName].Value = defaultVal;
-                dataGridView1.Rows[rowno].Cells[setCmbVal].Value = defaultVal;
-                rowno += 2;
+            {                
+                for (int subver = 0; subver < verticalsubSecCount; subver++)
+                {
+                    dataGridView1.Rows[rowno].Cells[setcellName].Value = defaultVal;
+                    dataGridView1.Rows[rowno].Cells[setCmbVal].Value = defaultVal;
+                    rowno++;
+                }
+                rowno ++;
             }
         }
 
         private void CalculateDataUsingFormula(List<EmployeeDetails> empData, IEnumerable<string> verticals)
         {
+            var averageColumnName = "Average";
             var updateColumnName = cmbBillingCycle.SelectedItem.ToString();
 
             //------------Financial Data
@@ -250,25 +261,36 @@ namespace WindowsPOC
             dataGridView1.Rows[3].Cells[updateColumnName].Value = String.Format("{0:F2}", Calculate.CalculateGM(getOnsiteRevenue, getOnsiteSalary, true));
             dataGridView1.Rows[4].Cells[updateColumnName].Value = String.Format("{0:F2}", Calculate.CalculateGM(getOnShoreRevenue, getOnShoreSalary, true));
 
+            dataGridView1.Rows[1].Cells[averageColumnName].Value = CalculateAverage(1);
+            dataGridView1.Rows[2].Cells[averageColumnName].Value = CalculateAverage(2);
+            dataGridView1.Rows[3].Cells[averageColumnName].Value = CalculateAverage(3);
+            dataGridView1.Rows[4].Cells[averageColumnName].Value = CalculateAverage(4);
+
             //------------Resource Counts Data
 
             dataGridView1.Rows[6].Cells[updateColumnName].Value = empData.Count();
             dataGridView1.Rows[7].Cells[updateColumnName].Value = empData.Where(a => a.IsOnsite).Count();
             dataGridView1.Rows[8].Cells[updateColumnName].Value = empData.Where(a => !a.IsOnsite).Count();
 
+            dataGridView1.Rows[6].Cells[averageColumnName].Value = CalculateAverage(6);
+            dataGridView1.Rows[7].Cells[averageColumnName].Value = CalculateAverage(7);
+            dataGridView1.Rows[8].Cells[averageColumnName].Value = CalculateAverage(8);
+
             //------------Account Management Count
             dataGridView1.Rows[9].Cells[updateColumnName].Value = empData.Where(a => a.AccountID == 1).Count();
+            dataGridView1.Rows[9].Cells[averageColumnName].Value = CalculateAverage(9);
 
             //------------Account MGMT Cost
             var mgmCost = Calculate.CalculateSum(empData, CalculationType.Salary, CalculationType.IsAccMgmt);
             dataGridView1.Rows[11].Cells[updateColumnName].Value = String.Format("{0:F2}", Calculate.CalculatePercent(mgmCost, getFullRevenue));
-
+            dataGridView1.Rows[11].Cells[averageColumnName].Value = CalculateAverage(11);
             //------------NB Count
             dataGridView1.Rows[12].Cells[updateColumnName].Value = empData.Where(a => !a.IsBillable).Count();
-
+            dataGridView1.Rows[12].Cells[averageColumnName].Value = CalculateAverage(12);
             //------------NB Cost
             var nbCost = Calculate.CalculateSum(empData, CalculationType.Salary, CalculationType.IsNonBillable);
             dataGridView1.Rows[14].Cells[updateColumnName].Value = String.Format("{0:F2}", Calculate.CalculatePercent(nbCost, getFullRevenue));
+            dataGridView1.Rows[14].Cells[averageColumnName].Value = CalculateAverage(14);
 
             //----------------Calculations According to verticals
             int colno = 17;
@@ -277,95 +299,37 @@ namespace WindowsPOC
                 //% of Rev
                 var verticalrev = Calculate.CalculateSumWithVerticalName(empData, CalculationType.Revenue, CalculationType.None, vert);
                 dataGridView1.Rows[colno].Cells[updateColumnName].Value = String.Format("{0:F2}", Calculate.CalculatePercent(verticalrev, getFullRevenue));
+                dataGridView1.Rows[colno].Cells[averageColumnName].Value = CalculateAverage(colno); 
                 colno++;
 
                 //Onsite % of Rev
                 var verticalonsiterev = Calculate.CalculateSumWithVerticalName(empData, CalculationType.Revenue, CalculationType.IsOnsite, vert); //empData.Where(a => a.VerticalName == vert && a.IsOnsite).Select(a => a.Revenue).Sum();
                 dataGridView1.Rows[colno].Cells[updateColumnName].Value = String.Format("{0:F2}", Calculate.CalculatePercent(verticalonsiterev, verticalrev));
+                dataGridView1.Rows[colno].Cells[averageColumnName].Value = CalculateAverage(colno); 
                 colno++;
 
                 //Offshore % of Rev
                 var verticaloffshorerev = Calculate.CalculateSumWithVerticalName(empData, CalculationType.Revenue, CalculationType.IsOffShore, vert);//empData.Where(a => a.VerticalName == vert && !a.IsOnsite).Select(a => a.Revenue).Sum();
                 dataGridView1.Rows[colno].Cells[updateColumnName].Value = String.Format("{0:F2}", Calculate.CalculatePercent(verticaloffshorerev, verticalrev));//(offshorerev == 0 ? 0 : (verticaloffshorerev / offshorerev) * 100));
+                dataGridView1.Rows[colno].Cells[averageColumnName].Value = CalculateAverage(colno); 
                 colno++;
 
                 //Onsite GM
                 dataGridView1.Rows[colno].Cells[updateColumnName].Value = String.Format("{0:F2}", Calculate.CalculateGM(verticalonsiterev, verticalrev, true));//(onsitegm == 0 ? 0 : (onsitegm - verticalonsitegm) / onsitegm));
+                dataGridView1.Rows[colno].Cells[averageColumnName].Value = CalculateAverage(colno); 
                 colno++;
 
                 //Offshore GM
                 var verticaloffshoregm = Calculate.CalculateSumWithVerticalName(empData, CalculationType.Salary, CalculationType.None, vert);
                 dataGridView1.Rows[colno].Cells[updateColumnName].Value = String.Format("{0:F2}", Calculate.CalculateGM(verticaloffshorerev, verticaloffshoregm, true));//(offshoregm == 0 ? 0 : (offshoregm - verticaloffshoregm) / offshoregm));
+                dataGridView1.Rows[colno].Cells[averageColumnName].Value = CalculateAverage(colno); 
                 colno += 2;
             }
             //-----------------------------------------------------------------------
 
             int totalCellCount = dataGridView1.Columns.Count - 3;
-            CalculateAverageDataUsingFormula(empData, totalCellCount, verticals);
-
         }
-
-        private void CalculateAverageDataUsingFormula(List<EmployeeDetails> empData, int totalCellCount, IEnumerable<string> allverticals)
-        {
-            string setcellName = "AVERAGE";
-
-            Particulars p = new Particulars();
-            var particulars = p.GetAllParticulars();
-            for (int colcnt = 3; colcnt <= dataGridView1.Columns.Count - 1; colcnt++)
-            {
-                foreach (var part in particulars)
-                {
-                    foreach (var subtype in part.ParticularsSubTypes)
-                    {
-                        dataGridView1.Rows[subtype.SubTypeID].Cells[setcellName].Value = (Convert.ToDecimal(dataGridView1.Rows[subtype.SubTypeID].Cells[setcellName].Value) + Convert.ToDecimal(dataGridView1.Rows[subtype.SubTypeID].Cells[colcnt].Value));
-                    }
-                }
-                //dataGridView1.Rows[3].Cells[setcellName].Value = empData.Where(a => a.IsOnsite).Select(a => (a.Revenue - a.CTC / a.Revenue)) == null ? 0 : (Convert.ToDecimal(dataGridView1.Rows[3].Cells[setcellName].Value) + Convert.ToDecimal(dataGridView1.Rows[3].Cells[colcnt].Value));
-            }
-
-            foreach (var part in particulars)
-            {
-                foreach (var subtype in part.ParticularsSubTypes)
-                {
-                    dataGridView1.Rows[subtype.SubTypeID].Cells[setcellName].Value = String.Format("{0:F2}", (Convert.ToDecimal(dataGridView1.Rows[subtype.SubTypeID].Cells[setcellName].Value)) / totalCellCount);
-                }
-            }
-
-
-            int colno = 17;
-            foreach (var vert in allverticals)
-            {
-                for (int i = 0; i < 5; i++)
-                {
-                    for (int colcnt = 3; colcnt <= dataGridView1.Columns.Count - 1; colcnt++)
-                    {
-                        dataGridView1.Rows[colno].Cells[setcellName].Value = String.Format("{0:F2}", (Convert.ToDecimal(dataGridView1.Rows[colno].Cells[setcellName].Value) + Convert.ToDecimal(dataGridView1.Rows[colno].Cells[colcnt].Value)));
-                        colno++;
-                    }
-
-                } colno++;
-            }
-            colno = 17;
-            foreach (var vert in allverticals)
-            {
-                for (int i = 0; i < 5; i++)
-                {
-                    for (int colcnt = 3; colcnt <= dataGridView1.Columns.Count - 1; colcnt++)
-                    {
-                        colno++;
-                        dataGridView1.Rows[colno].Cells[setcellName].Value = String.Format("{0:F2}", (Convert.ToDecimal(dataGridView1.Rows[colno].Cells[setcellName].Value)) / totalCellCount);
-                    }
-
-                } colno++;
-            }
-
-            for (int colcnt = 0; colcnt <= dataGridView1.Columns.Count - 1; colcnt++)
-            {
-                dataGridView1.Columns[colcnt].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
-            }
-
-        }
-                
+                        
         private void DisableControls()
         {
             btnExportExcel.Enabled = false;
@@ -497,11 +461,11 @@ namespace WindowsPOC
         private bool ExportDataToExcel()
         {
             // creating Excel Application  
+            Microsoft.Office.Interop.Excel._Application app = new Microsoft.Office.Interop.Excel.Application();
+            // creating new WorkBook within Excel application  
+            Microsoft.Office.Interop.Excel._Workbook workbook = app.Workbooks.Add(Type.Missing);
             try
-            {
-                Microsoft.Office.Interop.Excel._Application app = new Microsoft.Office.Interop.Excel.Application();
-                // creating new WorkBook within Excel application  
-                Microsoft.Office.Interop.Excel._Workbook workbook = app.Workbooks.Add(Type.Missing);
+            {                
                 // creating new Excelsheet in workbook  
                 Microsoft.Office.Interop.Excel._Worksheet worksheet = null;
                 // see the excel sheet behind the program  
@@ -526,7 +490,7 @@ namespace WindowsPOC
                     }
                 }
                 var outputPath = Properties.Settings.Default.OutputFolderPath;
-                outputPath += cmbAccountName.Text + "\\" + cmbBillingCycle.Text + "\\";
+                outputPath += cmbAccountName.Text + "\\";
                 if (!Directory.Exists(outputPath))
                 {
                     Directory.CreateDirectory(outputPath);
@@ -534,21 +498,27 @@ namespace WindowsPOC
 
                 var path = outputPath + cmbBillingCycle.Text + ".xls";
 
-                //var path = outputPath + cmbAccountName.Text + "\\" + cmbBillingCycle.Text + "\\" + "output.xls";
-                //var path = outputPath + "output.xls";
-                //CreatePathForExport(path);
-
                 // save the application  
                 workbook.SaveAs(path, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlExclusive, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
 
-                workbook.Close();
+                //workbook.Close();
 
+                workbook.Close(0);
+                app.Quit();
+                System.Runtime.InteropServices.Marshal.ReleaseComObject(app);
                 // Exit from the application  
                 return true;
             }
             catch
             {
                 return false;
+            }
+            finally
+            {
+                if (workbook != null)
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(workbook);
+                app.Quit();
+                System.Runtime.InteropServices.Marshal.ReleaseComObject(app);
             }
         }
 
@@ -563,66 +533,12 @@ namespace WindowsPOC
         #endregion
 
         #region Display uploaded Employee Data
-
-        private void btnReadData_Click(object sender, EventArgs e)
-        {
-            ReadAndPopulateDataFromExcelSheet();
-        }
-
-        //Populate Previous Data
-        private void ReadAndPopulateDataFromExcelSheet()
-        {
-
-            Microsoft.Office.Interop.Excel.Application oExcel = new Microsoft.Office.Interop.Excel.Application();
-
-            //specify the file name where its actually exist  
-            var readOutputfile = Properties.Settings.Default.OutputFolderPath;
-            string filepath = readOutputfile + "output.xls";
-
-            //pass that to workbook object  
-            Microsoft.Office.Interop.Excel.Workbook WB = oExcel.Workbooks.Open(filepath);
-
-
-            // statement get the workbookname  
-            string ExcelWorkbookname = WB.Name;
-
-            // statement get the worksheet count  
-            int worksheetcount = WB.Worksheets.Count;
-
-            Microsoft.Office.Interop.Excel.Worksheet wks = (Microsoft.Office.Interop.Excel.Worksheet)WB.Worksheets[1];
-
-            // statement get the firstworksheetname  
-
-            Microsoft.Office.Interop.Excel.Range range = wks.UsedRange;
-            int rows_count = range.Rows.Count;
-
-            string firstworksheetname = wks.Name;
-
-
-            //var verticals = empData.Select(a => a.VerticalName).Distinct();
-            CreateColumnsForGrid(null);
-            dataGridView1.Rows.Add(rows_count - 17);
-            //statement get the first cell value  
-            for (int i = 1; i < dataGridView1.Columns.Count + 1; i++)
-            {
-                dataGridView1.Columns[i - 1].HeaderText = wks.Cells[1, i].Text;
-            }
-            // storing Each row and column value to excel sheet  
-            for (int i = 0; i < rows_count - 1; i++)
-            {
-                for (int j = 0; j < dataGridView1.Columns.Count; j++)
-                {
-                    dataGridView1.Rows[i].Cells[j].Value = wks.Cells[i + 2, j + 1].Text;
-                }
-            }
-            MessageBox.Show("Data read successfully");
-        }
-
+        
         private void btnDisplayEmployeeModel_Click(object sender, EventArgs e)
         {
             vemp = new ProcessFiles();
-            List<string> errorMsgs;
-            var empData = vemp.ProcessEmpFiles(costPath, billingPath, out errorMsgs);
+            List<ErrorMessage> errorMsgs= new List<ErrorMessage>();
+            var empData = vemp.ProcessEmpFiles(costPath, billingPath, ref errorMsgs);
             if (errorMsgs.Count() == 0)
                 dataGridView1.DataSource = empData;
             else
@@ -631,6 +547,163 @@ namespace WindowsPOC
         }
 
         #endregion
-        
+
+        #region Read Excel Data from Previous Sheets
+                
+        private void ReadDataForAccount(string SelectedAccount)
+        {
+            try
+            {
+                List<int> rownumbers = new List<int>();
+                //specify the file name where its actually exist  
+                var readOutputfile = Properties.Settings.Default.OutputFolderPath;
+                string filepath = string.Empty;
+                    int rows_count = 0;
+                    Microsoft.Office.Interop.Excel.Application oExcel = new Microsoft.Office.Interop.Excel.Application();
+                    try
+                    {
+                        DirectoryInfo dirInfo = new DirectoryInfo(readOutputfile + SelectedAccount + "//");
+                        var files = dirInfo.GetFiles();
+                        int counter = 1;
+                        foreach (FileInfo fileInfo in files)
+                        {
+                            filepath = readOutputfile + SelectedAccount + "\\" + fileInfo.Name;
+                            Microsoft.Office.Interop.Excel.Workbook WB = oExcel.Workbooks.Open(filepath);
+                            try
+                            {
+                                // statement get the workbookname  
+                                string ExcelWorkbookname = WB.Name;
+                                // statement get the worksheet count  
+                                int worksheetcount = WB.Worksheets.Count;
+
+                                Microsoft.Office.Interop.Excel.Worksheet wks = (Microsoft.Office.Interop.Excel.Worksheet)WB.Worksheets[1];
+
+                                // statement get the firstworksheetname  
+                                Microsoft.Office.Interop.Excel.Range range = wks.UsedRange;
+
+                                if (counter == 1)
+                                {
+                                    rows_count = range.Rows.Count;
+                                }
+
+                                string firstworksheetname = wks.Name;
+                                if (counter == 1)
+                                {
+                                    CreateColumnsForGrid(null);
+                                    dataGridView1.Rows.Add(rows_count - 17);
+                                    //statement get the first cell value  
+                                    for (int i = 1; i < dataGridView1.Columns.Count + 1; i++)
+                                    {
+                                        dataGridView1.Columns[i - 1].HeaderText = wks.Cells[1, i].Text;
+                                    }
+                                }
+                                if (counter > 1)
+                                {
+                                    dataGridView1.Columns.Add(fileInfo.Name.Replace(fileInfo.Extension, ""), fileInfo.Name.Replace(fileInfo.Extension, ""));
+                                }
+                                // storing Each row and column value to excel sheet  
+                                if (counter == 1)
+                                {
+                                    for (int i = 0; i < rows_count - 1; i++)
+                                    {
+                                        for (int j = 0; j < dataGridView1.Columns.Count; j++)
+                                        {
+                                            dataGridView1.Rows[i].Cells[j].Value = wks.Cells[i + 2, j + 1].Text;
+                                            decimal result;
+                                            if (decimal.TryParse(dataGridView1.Rows[i].Cells[j].Value.ToString(), out result))
+                                            {
+                                                if(!rownumbers.Exists(a=>a ==i))
+                                                    rownumbers.Add(i);
+                                            }                                          
+                                                
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    for (int i = 0; i < rows_count - 1; i++)
+                                    {
+                                        for (int j = dataGridView1.Columns.Count - 1; j < dataGridView1.Columns.Count; j++)
+                                        {
+                                            dataGridView1.Rows[i].Cells[j].Value = wks.Cells[i + 2, 4].Text;                                           
+                                        }
+                                    }
+                                }
+                                counter++;
+
+                            }
+                            catch (Exception e)
+                            {
+                                MessageBox.Show("Issue occured.." + e.Message);
+                            }
+                            finally
+                            {
+                                if (WB != null)
+                                    System.Runtime.InteropServices.Marshal.ReleaseComObject(WB);
+                            }
+                        }
+                        DisplayAverageData(rownumbers);
+                        MessageBox.Show("Data read successfully");
+                    }
+                    catch (Exception ex)
+                    {
+                    //    MessageBox.Show("Something went wrong.." + ex.Message);
+                    }
+                    finally
+                    {
+                        oExcel.Quit();
+                        System.Runtime.InteropServices.Marshal.ReleaseComObject(oExcel);
+                    }               
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("There was a problem reading the excel sheet, please try again in sometime! " + ex.Message);
+            }
+        }
+
+        #endregion
+
+        private void cmbAccountName_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ClearData();
+            ComboBox comboBox = (ComboBox)sender;
+
+            if (comboBox.SelectedIndex !=-1)
+                ReadDataForAccount(comboBox.SelectedItem.ToString());            
+        }
+
+        private void cmbBillingCycle_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ComboBox comboBox = (ComboBox)sender;
+            if (comboBox.SelectedItem != null)
+            {
+                var selectedBillingCycle = comboBox.SelectedItem.ToString();
+                bool gridviewcolumns = dataGridView1.Columns.Contains(selectedBillingCycle);
+                if (gridviewcolumns)
+                {
+                    MessageBox.Show("Column Data aleady available in the grid.\nPlease choose another month.");
+                    comboBox.SelectedIndex = -1;
+                }
+            }
+        }
+
+        private void DisplayAverageData(List<int> rowNumbers)
+        {
+            foreach (int row in rowNumbers)
+                dataGridView1.Rows[row].Cells["Average"].Value = CalculateAverage(row);
+        }
+
+        private decimal CalculateAverage(int rowNumber)
+        {
+            int columnStartIndex = 3;
+            int totalColumns = dataGridView1.Columns.Count - columnStartIndex;
+
+            decimal totalVal = 0;
+            for(int loop=columnStartIndex;loop <dataGridView1.Columns.Count;loop++)
+            {
+                totalVal += Convert.ToDecimal(dataGridView1.Rows[rowNumber].Cells[loop].Value);
+            }
+            return totalVal / totalColumns;            
+        }
     }
 }

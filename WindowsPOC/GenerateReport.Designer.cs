@@ -42,7 +42,6 @@
             this.btnExportExcel = new System.Windows.Forms.Button();
             this.btnDiscrepencyRpt = new System.Windows.Forms.Button();
             this.btnExportPdf = new System.Windows.Forms.Button();
-            this.btnReadData = new System.Windows.Forms.Button();
             this.btnUploadBilling = new System.Windows.Forms.Button();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.btnDisplayEmployeeModel = new System.Windows.Forms.Button();
@@ -71,9 +70,9 @@
             this.lblUploadEmpDetails.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblUploadEmpDetails.Location = new System.Drawing.Point(12, 97);
             this.lblUploadEmpDetails.Name = "lblUploadEmpDetails";
-            this.lblUploadEmpDetails.Size = new System.Drawing.Size(156, 13);
+            this.lblUploadEmpDetails.Size = new System.Drawing.Size(108, 13);
             this.lblUploadEmpDetails.TabIndex = 1;
-            this.lblUploadEmpDetails.Text = "Upload Employee Details :";
+            this.lblUploadEmpDetails.Text = "Upload Cost File :";
             // 
             // lblUploadBillingDetails
             // 
@@ -81,9 +80,9 @@
             this.lblUploadBillingDetails.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblUploadBillingDetails.Location = new System.Drawing.Point(12, 139);
             this.lblUploadBillingDetails.Name = "lblUploadBillingDetails";
-            this.lblUploadBillingDetails.Size = new System.Drawing.Size(136, 13);
+            this.lblUploadBillingDetails.Size = new System.Drawing.Size(117, 13);
             this.lblUploadBillingDetails.TabIndex = 2;
-            this.lblUploadBillingDetails.Text = "Upload Billing Details :";
+            this.lblUploadBillingDetails.Text = "Upload Billing File :";
             // 
             // btnUploadEmp
             // 
@@ -122,6 +121,7 @@
             this.dataGridView1.ReadOnly = true;
             this.dataGridView1.Size = new System.Drawing.Size(666, 319);
             this.dataGridView1.TabIndex = 7;
+            this.dataGridView1.UseWaitCursor = true;
             // 
             // lblBillingCycle
             // 
@@ -141,6 +141,7 @@
             this.cmbBillingCycle.Name = "cmbBillingCycle";
             this.cmbBillingCycle.Size = new System.Drawing.Size(269, 21);
             this.cmbBillingCycle.TabIndex = 9;
+            this.cmbBillingCycle.SelectedIndexChanged += new System.EventHandler(this.cmbBillingCycle_SelectedIndexChanged);
             // 
             // cmbAccountName
             // 
@@ -150,6 +151,7 @@
             this.cmbAccountName.Name = "cmbAccountName";
             this.cmbAccountName.Size = new System.Drawing.Size(269, 21);
             this.cmbAccountName.TabIndex = 11;
+            this.cmbAccountName.SelectedIndexChanged += new System.EventHandler(this.cmbAccountName_SelectedIndexChanged);
             // 
             // label1
             // 
@@ -164,9 +166,9 @@
             // btnExportExcel
             // 
             this.btnExportExcel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnExportExcel.Location = new System.Drawing.Point(538, 168);
+            this.btnExportExcel.Location = new System.Drawing.Point(552, 167);
             this.btnExportExcel.Name = "btnExportExcel";
-            this.btnExportExcel.Size = new System.Drawing.Size(104, 27);
+            this.btnExportExcel.Size = new System.Drawing.Size(91, 27);
             this.btnExportExcel.TabIndex = 12;
             this.btnExportExcel.Text = "Export to Excel";
             this.btnExportExcel.UseVisualStyleBackColor = true;
@@ -186,24 +188,13 @@
             // btnExportPdf
             // 
             this.btnExportPdf.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnExportPdf.Location = new System.Drawing.Point(443, 168);
+            this.btnExportPdf.Location = new System.Drawing.Point(470, 167);
             this.btnExportPdf.Name = "btnExportPdf";
-            this.btnExportPdf.Size = new System.Drawing.Size(89, 27);
+            this.btnExportPdf.Size = new System.Drawing.Size(76, 27);
             this.btnExportPdf.TabIndex = 14;
             this.btnExportPdf.Text = "Export to Pdf";
             this.btnExportPdf.UseVisualStyleBackColor = true;
             this.btnExportPdf.Click += new System.EventHandler(this.btnExportPdf_Click);
-            // 
-            // btnReadData
-            // 
-            this.btnReadData.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnReadData.Location = new System.Drawing.Point(509, 90);
-            this.btnReadData.Name = "btnReadData";
-            this.btnReadData.Size = new System.Drawing.Size(133, 27);
-            this.btnReadData.TabIndex = 15;
-            this.btnReadData.Text = "Read Previous Data";
-            this.btnReadData.UseVisualStyleBackColor = true;
-            this.btnReadData.Click += new System.EventHandler(this.btnReadData_Click);
             // 
             // btnUploadBilling
             // 
@@ -227,7 +218,6 @@
             this.splitContainer1.Panel1.Controls.Add(this.btnDisplayEmployeeModel);
             this.splitContainer1.Panel1.Controls.Add(this.btnClear);
             this.splitContainer1.Panel1.Controls.Add(this.btnExportPdf);
-            this.splitContainer1.Panel1.Controls.Add(this.btnReadData);
             this.splitContainer1.Panel1.Controls.Add(this.btnExportExcel);
             this.splitContainer1.Panel1.Controls.Add(this.btnDiscrepencyRpt);
             this.splitContainer1.Panel1.Controls.Add(this.txtEmpDetailsExcellName);
@@ -248,9 +238,9 @@
             // btnDisplayEmployeeModel
             // 
             this.btnDisplayEmployeeModel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnDisplayEmployeeModel.Location = new System.Drawing.Point(294, 168);
+            this.btnDisplayEmployeeModel.Location = new System.Drawing.Point(510, 132);
             this.btnDisplayEmployeeModel.Name = "btnDisplayEmployeeModel";
-            this.btnDisplayEmployeeModel.Size = new System.Drawing.Size(124, 27);
+            this.btnDisplayEmployeeModel.Size = new System.Drawing.Size(133, 27);
             this.btnDisplayEmployeeModel.TabIndex = 17;
             this.btnDisplayEmployeeModel.Text = "Show Employee Data";
             this.btnDisplayEmployeeModel.UseVisualStyleBackColor = true;
@@ -259,7 +249,7 @@
             // btnClear
             // 
             this.btnClear.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnClear.Location = new System.Drawing.Point(509, 131);
+            this.btnClear.Location = new System.Drawing.Point(510, 90);
             this.btnClear.Name = "btnClear";
             this.btnClear.Size = new System.Drawing.Size(133, 27);
             this.btnClear.TabIndex = 16;
@@ -271,7 +261,6 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.AutoSize = true;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(666, 519);
             this.Controls.Add(this.label1);
@@ -279,10 +268,12 @@
             this.Controls.Add(this.lblUploadBillingDetails);
             this.Controls.Add(this.lblUploadEmpDetails);
             this.Controls.Add(this.splitContainer1);
+            this.Cursor = System.Windows.Forms.Cursors.Default;
+            this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "GenerateReport";
-            this.ShowIcon = false;
             this.Text = "Report";
+            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel1.PerformLayout();
@@ -310,7 +301,6 @@
         private System.Windows.Forms.Button btnExportExcel;
         private System.Windows.Forms.Button btnDiscrepencyRpt;
         private System.Windows.Forms.Button btnExportPdf;
-        private System.Windows.Forms.Button btnReadData;
         private System.Windows.Forms.Button btnUploadBilling;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.Button btnClear;
