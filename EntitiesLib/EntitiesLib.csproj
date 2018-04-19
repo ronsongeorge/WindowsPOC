@@ -59,6 +59,7 @@
   <ItemGroup>
     <Compile Include="CalculationType.cs" />
     <Compile Include="EmployeeDetails.cs" />
+    <Compile Include="ErrorMessage.cs" />
     <Compile Include="Particulars.cs">
       <SubType>Code</SubType>
     </Compile>

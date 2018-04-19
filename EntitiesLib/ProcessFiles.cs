@@ -14,11 +14,14 @@ namespace EntitiesLib
 
         XDocument doc = new XDocument();
         List<EmployeeDetails> EmployeeObjtList = null;
-        List<string> ErrorMessage = null;
+       // List<ErrorMessage> errMsgList = new List<ErrorMessage>();
+        string FileType = string.Empty;
+        ErrorMessage errMsg = null;
 
-        public List<EmployeeDetails> ProcessEmpFiles(string pathCost, string pathBilling, out List<string> ErrorMessage)
-        {
-            ErrorMessage = new List<string>();
+        public List<EmployeeDetails> ProcessEmpFiles(string pathCost, string pathBilling, ref List<ErrorMessage> errMsgList)
+        {          
+            FileType = "Cost File";
+            Dictionary<string, string> ErrorMessageList = new Dictionary<string, string>();
             var path = Assembly.GetExecutingAssembly().Location;
             path = path.Substring(0, path.LastIndexOf('\\')) + "\\" + "Configuration.xml";
             doc = XDocument.Load(path);
@@ -75,7 +78,9 @@ namespace EntitiesLib
                     }
                     else
                     {
-                        ErrorMessage.Add(string.Format("Proper Employee name not found at row :{0} in file:{1}", row.RowNum, pathCost));
+                        errMsg = new ErrorMessage(FileType, string.Format("Proper Employee name not found at row :{0}", row.RowNum));
+                        errMsgList.Add(errMsg);
+                     
                         continue;
                     }
 
@@ -85,7 +90,9 @@ namespace EntitiesLib
                         emp.VerticalName = row.Cells[GroupName - 1].ToString();
                     else
                     {
-                        ErrorMessage.Add(string.Format("VerticalName not found at row :{0} in file:{1}", row.RowNum, pathCost));
+
+                        errMsg = new ErrorMessage(FileType, string.Format("Vertical Name not found at row: {0} for Employee: {1}", row.RowNum, emp.EmployeeName));
+                        errMsgList.Add(errMsg);
                         continue;
 
                     }
@@ -94,15 +101,17 @@ namespace EntitiesLib
                         emp.ManagerName = row.Cells[ManagerName - 1].ToString();
                     else
                     {
-                        ErrorMessage.Add(string.Format("ManagerName not found at row :{0} in file:{1}", row.RowNum, pathCost));
+                        errMsg = new ErrorMessage(FileType, string.Format("ManagerName not found at row : {0} for Employee: {1}", row.RowNum, emp.EmployeeName));
+                        errMsgList.Add(errMsg);
                         continue;
                     }
 
-                    if (decimal.TryParse(row.Cells[Salary - 1].NumericCellValue.ToString(), out salary))
+                    if (decimal.TryParse(row.Cells[Salary - 1].NumericCellValue.ToString(), out salary) && salary != 0)
                         emp.Salary = (decimal)row.Cells[Salary - 1].NumericCellValue / 12;
                     else
                     {
-                        ErrorMessage.Add(string.Format("Cannot parse Salary at row :{0} in file:{1}", row.RowNum, pathCost));
+                        errMsg = new ErrorMessage(FileType, string.Format("Cannot parse Salary at row :{0} for Employee: {1}", row.RowNum, emp.EmployeeName));
+                        errMsgList.Add(errMsg);
                         continue;
                     }
 
@@ -117,25 +126,27 @@ namespace EntitiesLib
                     }
                     else
                     {
-                        ErrorMessage.Add(string.Format("Duplicate Employee ID Found:{0} in cost file: {1}", emp.EmployeeID, pathCost));
-
+                        errMsg = new ErrorMessage(FileType, string.Format("Duplicate Employee ID Found:{0} in cost file for Employee: {1}", emp.EmployeeID, emp.EmployeeName));
+                        errMsgList.Add(errMsg);
                     }
                 }
                 catch (Exception ex)
                 {
-                    throw new Exception(string.Format("Exception while parsing cost file:{0} at row {1}- {2}", pathCost, row.RowNum, ex.Message));
+                    throw new Exception(string.Format("Exception while parsing cost file:{0} at row {1} - {2}", pathCost, row.RowNum, ex.Message));
                 }
 
             }
 
-            if (ValidateEmpDetails(pathBilling, columns, ref ErrorMessage) && ErrorMessage.Count == 0)
+            if (ValidateEmpDetails(pathBilling, columns, ref errMsgList))
                 return EmployeeObjtList;
             else
                 return null;
+
         }
 
-        private bool ValidateEmpDetails(string pathBilling, XElement columns, ref List<string> errorMsg)
+        private bool ValidateEmpDetails(string pathBilling, XElement columns, ref List<ErrorMessage> errMsgList)
         {
+            FileType = "Billing File";
             bool isSucess = false;
             IWorkbook workbook;
             using (FileStream stream = new FileStream(pathBilling, FileMode.Open, FileAccess.Read))
@@ -176,23 +187,25 @@ namespace EntitiesLib
                     emdId = Convert.ToInt16(row.Cells[empIdColumn - 1].ToString());
                     empIdList.Add(emdId);
                 }
-                catch (Exception ex)
+                catch
                 {
-
-
+                    // junk data
                 }
 
             }
 
+            // validating emp id against cost file
             foreach (EmployeeDetails e in EmployeeObjtList)
             {
                 if (!empIdList.Contains(e.EmployeeID))
                 {
-                    errorMsg.Add(string.Format("Employee ID: {0} does not exist in billing file: {1} ", e.EmployeeID, pathBilling));
+                    errMsg = new ErrorMessage(FileType, string.Format("Employee ID: {0} does not exist in billing file for Employee: {1}", e.EmployeeID, e.EmployeeName));
+                    errMsgList.Add(errMsg);
                 }
 
             }
 
+            // adding revenue and is billable field to emp object
             foreach (IRow row in sheet)
             {
                 value = 0;
@@ -253,7 +266,8 @@ namespace EntitiesLib
                     else// CLIENT OR NEW MEMBER?
                     {
 
-                        errorMsg.Add(string.Format("Employee ID: {0} does not exist in cost file {1} ", id, pathBilling));
+                        errMsg = new ErrorMessage(FileType, string.Format("Employee ID: {0} does not exist in cost file as mentioned in Billing file row: {1}", id, row.RowNum));
+                        errMsgList.Add(errMsg);
                     }
                 }
                 catch

@@ -1,0 +1,4 @@
+C:\Users\User1\Documents\GitHub\WindowsPOC\ExportFunction\bin\Debug\ExportFunction.dll
+C:\Users\User1\Documents\GitHub\WindowsPOC\ExportFunction\bin\Debug\ExportFunction.pdb
+C:\Users\User1\Documents\GitHub\WindowsPOC\ExportFunction\obj\Debug\ExportFunction.dll
+C:\Users\User1\Documents\GitHub\WindowsPOC\ExportFunction\obj\Debug\ExportFunction.pdb

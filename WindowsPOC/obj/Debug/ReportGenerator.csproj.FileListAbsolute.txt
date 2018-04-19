@@ -34,6 +34,11 @@ D:\Ronson\WindowsPOC\WindowsPOC\obj\Debug\WindowsPOC.exe.manifest
 D:\Ronson\WindowsPOC\WindowsPOC\obj\Debug\WindowsPOC.application
 D:\Ronson\WindowsPOC\WindowsPOC\obj\Debug\WindowsPOC.exe
 D:\Ronson\WindowsPOC\WindowsPOC\obj\Debug\WindowsPOC.pdb
+C:\Users\User1\Documents\GitHub\WindowsPOC\WindowsPOC\obj\Debug\ReportGenerator.csprojResolveAssemblyReference.cache
+C:\Users\User1\Documents\GitHub\WindowsPOC\WindowsPOC\obj\Debug\WindowsPOC.AccountForm.resources
+C:\Users\User1\Documents\GitHub\WindowsPOC\WindowsPOC\obj\Debug\WindowsPOC.GenerateReport.resources
+C:\Users\User1\Documents\GitHub\WindowsPOC\WindowsPOC\obj\Debug\WindowsPOC.Properties.Resources.resources
+C:\Users\User1\Documents\GitHub\WindowsPOC\WindowsPOC\obj\Debug\ReportGenerator.csproj.GenerateResource.Cache
 C:\Users\User1\Documents\GitHub\WindowsPOC\WindowsPOC\bin\Debug\Configuration.xml
 C:\Users\User1\Documents\GitHub\WindowsPOC\WindowsPOC\bin\Debug\WindowsPOC.exe.config
 C:\Users\User1\Documents\GitHub\WindowsPOC\WindowsPOC\bin\Debug\WindowsPOC.exe.manifest
@@ -52,10 +57,6 @@ C:\Users\User1\Documents\GitHub\WindowsPOC\WindowsPOC\bin\Debug\DataLayer.pdb
 C:\Users\User1\Documents\GitHub\WindowsPOC\WindowsPOC\bin\Debug\EntitiesLib.pdb
 C:\Users\User1\Documents\GitHub\WindowsPOC\WindowsPOC\bin\Debug\itextsharp.xml
 C:\Users\User1\Documents\GitHub\WindowsPOC\WindowsPOC\bin\Debug\NPOI.xml
-C:\Users\User1\Documents\GitHub\WindowsPOC\WindowsPOC\obj\Debug\ReportGenerator.csprojResolveAssemblyReference.cache
-C:\Users\User1\Documents\GitHub\WindowsPOC\WindowsPOC\obj\Debug\WindowsPOC.GenerateReport.resources
-C:\Users\User1\Documents\GitHub\WindowsPOC\WindowsPOC\obj\Debug\WindowsPOC.Properties.Resources.resources
-C:\Users\User1\Documents\GitHub\WindowsPOC\WindowsPOC\obj\Debug\ReportGenerator.csproj.GenerateResource.Cache
 C:\Users\User1\Documents\GitHub\WindowsPOC\WindowsPOC\obj\Debug\WindowsPOC.exe.manifest
 C:\Users\User1\Documents\GitHub\WindowsPOC\WindowsPOC\obj\Debug\WindowsPOC.application
 C:\Users\User1\Documents\GitHub\WindowsPOC\WindowsPOC\obj\Debug\WindowsPOC.exe

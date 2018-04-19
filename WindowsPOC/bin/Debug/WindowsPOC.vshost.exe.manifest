@@ -74,19 +74,19 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>XlFt0I/VsG5vsf512zS2Q6hLB5gaTM6fqqC8XNxtAfY=</dsig:DigestValue>
+        <dsig:DigestValue>JrJ4qTmWA56hrYut970hY6Am+I9xbQ394UJz+FHYG9c=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="EntitiesLib.dll" size="18944">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="EntitiesLib.dll" size="19968">
       <assemblyIdentity name="EntitiesLib" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>X2ZWDsrH+fDjLcL1SExf0HFASyOWCijmswjy4k3zrxs=</dsig:DigestValue>
+        <dsig:DigestValue>VdowWuAqnMLqpboaG+Z/gOpy20PCNReAJT3RT8A3wX4=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -163,33 +163,33 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="WindowsPOC.exe" size="36352">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="WindowsPOC.exe" size="40448">
       <assemblyIdentity name="WindowsPOC" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>bYKMQXWN5NX57eE1pg4RxIPYuavitqvak3EtU7wHd9I=</dsig:DigestValue>
+        <dsig:DigestValue>YJHFQFTxxw8upwPF+ha9shsBla1CF4EiICVjAjeetc8=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
-  <file name="Configuration.xml" size="1614">
+  <file name="Configuration.xml" size="1678">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>9/fxxFzjLHBzQo5lOea5vmzQ+wH/Nrfp3NlJUk1xwek=</dsig:DigestValue>
+      <dsig:DigestValue>umqGQfplSQLZVdilssbE8Z5i5PzcnW9WfLU6LweqM2k=</dsig:DigestValue>
     </hash>
   </file>
-  <file name="WindowsPOC.exe.config" size="1313">
+  <file name="WindowsPOC.exe.config" size="2223">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>KuMrkKPxINz7LwiUlo0q/1Mwp1CPTwq8K0kk0epyWCM=</dsig:DigestValue>
+      <dsig:DigestValue>gQeNnD8rCyo6ePwcGuOaf7NQO08dFXWMe+mOPJWdxJw=</dsig:DigestValue>
     </hash>
   </file>
 </asmv1:assembly>
