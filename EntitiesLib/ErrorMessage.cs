@@ -8,19 +8,16 @@ namespace EntitiesLib
 {
     public class ErrorMessage
     {
-        private string FileType1;
-        private string p;
-
         public string FileType { get; set; }
         public string Message { get; set; }
 
-      public ErrorMessage(string FileType,string Message)
+        public ErrorMessage(string FileType, string Message)
         {
             this.FileType = FileType;
             this.Message = Message;
         }
 
-        
+
     }
 
 }
