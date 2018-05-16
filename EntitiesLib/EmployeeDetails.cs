@@ -12,5 +12,7 @@ namespace EntitiesLib
         public bool IsOnsite { get; set; }
         public decimal Revenue { get; set; }
         public int AccountID { get; set; }
+        public int EmployeeTypeID { get; set; }
+        public decimal SeatCost { get; set; }
     }
 }

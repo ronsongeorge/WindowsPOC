@@ -1,0 +1,14 @@
+C:\Users\User1\Documents\GitHub\WindowsPOC\DataLayer\bin\Release\Configuration.xml
+C:\Users\User1\Documents\GitHub\WindowsPOC\DataLayer\bin\Release\DataLayer.dll
+C:\Users\User1\Documents\GitHub\WindowsPOC\DataLayer\bin\Release\DataLayer.pdb
+C:\Users\User1\Documents\GitHub\WindowsPOC\DataLayer\bin\Release\EntitiesLib.dll
+C:\Users\User1\Documents\GitHub\WindowsPOC\DataLayer\bin\Release\NPOI.OOXML.dll
+C:\Users\User1\Documents\GitHub\WindowsPOC\DataLayer\bin\Release\NPOI.dll
+C:\Users\User1\Documents\GitHub\WindowsPOC\DataLayer\bin\Release\NPOI.OpenXmlFormats.dll
+C:\Users\User1\Documents\GitHub\WindowsPOC\DataLayer\bin\Release\NPOI.OpenXml4Net.dll
+C:\Users\User1\Documents\GitHub\WindowsPOC\DataLayer\bin\Release\ICSharpCode.SharpZipLib.dll
+C:\Users\User1\Documents\GitHub\WindowsPOC\DataLayer\bin\Release\EntitiesLib.pdb
+C:\Users\User1\Documents\GitHub\WindowsPOC\DataLayer\bin\Release\NPOI.xml
+C:\Users\User1\Documents\GitHub\WindowsPOC\DataLayer\obj\Release\DataLayer.csprojResolveAssemblyReference.cache
+C:\Users\User1\Documents\GitHub\WindowsPOC\DataLayer\obj\Release\DataLayer.dll
+C:\Users\User1\Documents\GitHub\WindowsPOC\DataLayer\obj\Release\DataLayer.pdb

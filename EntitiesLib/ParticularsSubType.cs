@@ -5,5 +5,6 @@ namespace EntitiesLib
     {
         public int SubTypeID { get; set; }
         public string SubTypeName { get; set; }
+        public int ParticularID { get; set; }
     }
 }

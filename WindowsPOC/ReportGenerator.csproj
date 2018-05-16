@@ -24,7 +24,7 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ProductName>POC App</ProductName>
     <PublisherName>Ronson George</PublisherName>
-    <ApplicationRevision>4</ApplicationRevision>
+    <ApplicationRevision>8</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -73,11 +73,10 @@
     <Reference Include="Microsoft.Office.Interop.Excel, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
-    <Reference Include="Microsoft.ReportViewer.Common, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91" />
-    <Reference Include="Microsoft.ReportViewer.WinForms, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Web.Services" />
+    <Reference Include="System.Windows.Forms.DataVisualization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -88,25 +87,103 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AccountForm.cs">
+    <Compile Include="Configuration\BUCreation.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="AccountForm.Designer.cs">
-      <DependentUpon>AccountForm.cs</DependentUpon>
+    <Compile Include="Configuration\BUCreation.Designer.cs">
+      <DependentUpon>BUCreation.cs</DependentUpon>
     </Compile>
-    <Compile Include="GenerateReport.cs">
+    <Compile Include="Configuration\AccountCreation.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GenerateReport.Designer.cs">
+    <Compile Include="Configuration\AccountCreation.Designer.cs">
+      <DependentUpon>AccountCreation.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dashboard.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dashboard.Designer.cs">
+      <DependentUpon>Dashboard.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UploadData\GenerateReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UploadData\GenerateReport.Designer.cs">
       <DependentUpon>GenerateReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\AccountAndBU\AccountReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Reports\AccountAndBU\AccountReport.Designer.cs">
+      <DependentUpon>AccountReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\AccountBased\GroupReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Reports\AccountBased\GroupReport.Designer.cs">
+      <DependentUpon>GroupReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\General\MonthlyAccountUpload.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Reports\General\MonthlyAccountUpload.Designer.cs">
+      <DependentUpon>MonthlyAccountUpload.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\AccountAndBU\SalaryReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Reports\AccountAndBU\SalaryReport.Designer.cs">
+      <DependentUpon>SalaryReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\AccountAndBU\PersonReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Reports\AccountAndBU\PersonReport.Designer.cs">
+      <DependentUpon>PersonReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\AccountAndBU\MarginPerPersonReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Reports\AccountAndBU\MarginPerPersonReport.Designer.cs">
+      <DependentUpon>MarginPerPersonReport.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="AccountForm.resx">
-      <DependentUpon>AccountForm.cs</DependentUpon>
+    <Compile Include="Reports\AccountBased\ManagerReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Reports\AccountBased\ManagerReport.Designer.cs">
+      <DependentUpon>ManagerReport.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="Configuration\BUCreation.resx">
+      <DependentUpon>BUCreation.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GenerateReport.resx">
+    <EmbeddedResource Include="Configuration\AccountCreation.resx">
+      <DependentUpon>AccountCreation.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dashboard.resx">
+      <DependentUpon>Dashboard.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UploadData\GenerateReport.resx">
       <DependentUpon>GenerateReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\AccountAndBU\AccountReport.resx">
+      <DependentUpon>AccountReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\AccountBased\GroupReport.resx">
+      <DependentUpon>GroupReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\General\MonthlyAccountUpload.resx">
+      <DependentUpon>MonthlyAccountUpload.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\AccountAndBU\SalaryReport.resx">
+      <DependentUpon>SalaryReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\AccountAndBU\PersonReport.resx">
+      <DependentUpon>PersonReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\AccountAndBU\MarginPerPersonReport.resx">
+      <DependentUpon>MarginPerPersonReport.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -117,7 +194,12 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="Reports\AccountBased\ManagerReport.resx">
+      <DependentUpon>ManagerReport.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="packages.config" />
+    <None Include="Properties\DataSources\DataLayer.AccountMonthRevenue.datasource" />
+    <None Include="Properties\DataSources\EntitiesLib.AccountMonthData.datasource" />
     <None Include="Properties\DataSources\EntitiesLib.Accounts.datasource" />
     <None Include="Properties\DataSources\EntitiesLib.EmpBillingViewData.datasource" />
     <None Include="Properties\DataSources\EntitiesLib.InputEmployeeDetails.datasource" />
@@ -140,6 +222,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\BusinessLayer\BusinessLayer.csproj">
+      <Project>{8503f175-b2a4-4a58-be98-def8283e93a5}</Project>
+      <Name>BusinessLayer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DataLayer\DataLayer.csproj">
       <Project>{7e77550f-70a8-4d2e-bea2-ac720715bf6d}</Project>
       <Name>DataLayer</Name>
@@ -174,14 +260,17 @@
   <ItemGroup>
     <PublishFile Include="Configuration.xml">
       <Visible>False</Visible>
-      <PublishState>Include</PublishState>
-      <IncludeHash>True</IncludeHash>
       <Group>
       </Group>
       <TargetPath>
       </TargetPath>
+      <PublishState>Include</PublishState>
+      <IncludeHash>True</IncludeHash>
       <FileType>File</FileType>
     </PublishFile>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

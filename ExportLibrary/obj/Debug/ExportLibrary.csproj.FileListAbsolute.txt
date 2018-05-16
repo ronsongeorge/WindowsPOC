@@ -1,0 +1,5 @@
+C:\Users\User1\Documents\GitHub\WindowsPOC\ExportLibrary\bin\Debug\ExportLibrary.dll
+C:\Users\User1\Documents\GitHub\WindowsPOC\ExportLibrary\bin\Debug\ExportLibrary.pdb
+C:\Users\User1\Documents\GitHub\WindowsPOC\ExportLibrary\obj\Debug\ExportLibrary.csprojResolveAssemblyReference.cache
+C:\Users\User1\Documents\GitHub\WindowsPOC\ExportLibrary\obj\Debug\ExportLibrary.dll
+C:\Users\User1\Documents\GitHub\WindowsPOC\ExportLibrary\obj\Debug\ExportLibrary.pdb

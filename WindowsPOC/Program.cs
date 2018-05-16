@@ -16,7 +16,7 @@ namespace WindowsPOC
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new GenerateReport());
+            Application.Run(new Dashboard());
         }
     }
 }
